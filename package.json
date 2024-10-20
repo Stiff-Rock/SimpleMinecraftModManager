@@ -1,0 +1,31 @@
+{
+  "name": "simple-minecraft-mod-manager",
+  "version": "0.1.0",
+  "description": "A simple minecraft mod manager for those who find annoying manual mod downloading but doesn't like using launcher either.",
+  "main": "src/main/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stiff-Rock/SimpleMinecraftModManager.git"
+  },
+  "keywords": [
+    "minecraft",
+    "mod",
+    "mod",
+    "manager",
+    "gaming",
+    "videogame"
+  ],
+  "author": "Stiff-Rock",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Stiff-Rock/SimpleMinecraftModManager/issues"
+  },
+  "homepage": "https://github.com/Stiff-Rock/SimpleMinecraftModManager#readme",
+  "devDependencies": {
+    "electron": "^33.0.1"
+  }
+}
