@@ -1,0 +1,13 @@
+{
+  "stagingApiUrl": "https://staging-api.modrinth.com/v2",
+  "liveApiUrl": "https://api.modrinth.com/v2",
+  "endpoints": {
+    "search": "/search?query=",
+    "facets": "&facets=",
+    "onlyMods": "[%22project_type:mod%22]",
+    "limit": "&limit=10",
+    "offset": "&offset=0",
+    "index": "&index=downloads"
+  },
+  "downloadPath": "C:\\Users\\Yago\\Downloads"
+}

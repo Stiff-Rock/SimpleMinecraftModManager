@@ -1,9 +1,22 @@
 async function fetchMods() {
     try {
-        const response = await fetch('https://staging-api.modrinth.com/v2/search');
-        const data = await response.json();
-        const mods = data.hits; 
+        const config = await window.api.getConfig();
+        const apiUrl = config.liveApiUrl;
+        const endpoints = config.endpoints;
+        const query = '';
 
+        const url = apiUrl
+            + endpoints.search
+            + query
+            + endpoints.facets
+            + '[' + endpoints.onlyMods + ']'
+            + endpoints.limit
+            + endpoints.offset
+            + endpoints.index;
+
+        const response = await fetch(url);
+        const data = await response.json();
+        const mods = data.hits;
         const modList = document.getElementById('modList');
         modList.innerHTML = '';
 
@@ -11,8 +24,13 @@ async function fetchMods() {
             const modItem = document.createElement('div');
             modItem.classList.add('mod-item');
 
+            modItem.addEventListener('click', () => {
+                localStorage.setItem('selectedMod', JSON.stringify(mod));
+                window.location.href = 'mod-view.html';
+            });
+
             const modImg = document.createElement('img');
-            modImg.src = mod.icon_url;
+            modImg.src = mod.icon_url ?? '../img/default-mod-icon.png';
             modImg.classList.add('mod-img');
             modItem.appendChild(modImg);
 
@@ -21,18 +39,32 @@ async function fetchMods() {
             modName.textContent = mod.title;
             modItem.appendChild(modName);
 
+            /*
+            const downloadButton = document.createElement('button');
+            downloadButton.classList.add('download-btn');
+            downloadButton.textContent = 'Download';
+            downloadButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Download logic
+            });
+            modItem.appendChild(downloadButton);
+            */
+           
             modList.appendChild(modItem);
-        })
+        });
+
+        if (mods.length === 0) {
+            const noModsMessage = document.createElement('p');
+            noModsMessage.textContent = 'No mods found.';
+            modList.appendChild(noModsMessage);
+        }
     } catch (error) {
         console.error('Error fetching mods:', error);
     }
 }
 
-// Call the function when the page loads
-document.addEventListener('DOMContentLoaded', fetchMods);
-
-
 document.addEventListener('DOMContentLoaded', () => {
+    /*
     document.getElementById('setPathBtn').addEventListener('click', async () => {
         console.log('Set Path Button clicked');
         const path = await window.api.setDownloadPath()
@@ -43,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Download path selection was canceled.')
         }
     })
+    */
 
     fetchMods()
 })

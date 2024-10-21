@@ -1,5 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  setDownloadPath: () => ipcRenderer.invoke('dialog:openDirectory')
-})
+  getConfig: () => ipcRenderer.invoke('get-config'),
+  setDownloadPath: () => ipcRenderer.invoke('dialog:openDirectory'),
+  downloadFile: (url, fileName) => ipcRenderer.invoke('download-file', url, fileName)
+});
