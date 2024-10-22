@@ -17,6 +17,26 @@
     margin-left: 40px;
 }
 
+#game-versions-select {
+    height: 20px;
+    width: 80px;
+    margin-left: 20px;
+}
+
+#mod-version-item {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    width: 700px;
+    height: 50px;
+    cursor: pointer;
+    justify-content: space-between;
+}
+
 #back-btn {
     position: fixed;
     bottom: 20px;

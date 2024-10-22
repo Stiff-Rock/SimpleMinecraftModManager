@@ -25,7 +25,7 @@ async function fetchMods() {
             modItem.classList.add('mod-item');
 
             modItem.addEventListener('click', () => {
-                localStorage.setItem('selectedMod', JSON.stringify(mod));
+                localStorage.setItem('selectedMod', mod.project_id);
                 window.location.href = 'mod-view.html';
             });
 
