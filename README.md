@@ -1,24 +1,25 @@
-# Mod Management Application
+# SimpleModManager
 
-## Description
-This application provides a comprehensive solution for managing and downloading mods for various games. It features a user-friendly interface and powerful tools for mod organization, version control, and dependency management.
+## What's This?
+This is a small Electron project for downloading Minecraft mods and managing your mods folder. My focus is to provide a simple interface for those who don't want to use third-party launchers but still prefer not to manage mod downloading manually. I'm doing everything by myself for now since this is just a casual project to learn and have fun. 
 
-## Features
-- **Mod Folder Management**: Easily manage and organize your mod folders.
-- **Tabbed Mod View**: View and manage mods through a tabbed interface for better organization.
-- **Download Options**: Download mods with prompts for selecting loaders and versions.
-- **Dependency Management**: Automatically manage dependencies for your mods.
-- **User Configuration**: Store user preferences for versions and loaders.
-- **Search Functionality**: Query-based search to find mods quickly.
-- **Filtering and Categorization**: Filter mods by categories for easier navigation.
-- **Pagination**: Browse through large lists of mods with pagination.
-- **App Icon**: Customizable app icon for branding.
+## How Does It Work?
+It runs by utilizing the Modrinth API and my little Electron and JavaScript/Node.js knowledge. It is really not usable at the moment, the UI is provisional and the features below are not really working or even implemented.
 
-## Future Ideas
-- **Profiles**: Manage multiple profiles for different configurations.
-- **Shaders and Texture Packs**: Integrate support for shaders and texture packs.
+## Short-Term Features
+- **Mod Downloading with automatic dependency matching**
+- **Mod Folder Management**
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/mod-management-app.git
+## Long-Term Features
+- **Create Profiles**
+- **Shaders and Texture Packs downloading and management**
+
+## Build
+Currently, there is no build of the app available, and I do not plan to create one in the long term, not until the app works properly. However, if you still want to try it, you can run it in your IDE (I use VSCode, but any IDE will work) or build it yourself. **Just make sure you have set up a Node.js project, as I do not include the node_modules.**
+
+### To Clone the Repository:
+```bash
+git clone https://github.com/Stiff-Rock/SimpleMinecraftModManager.git
+```
+
+Feel free to reach out if you have suggestions or want to contribute in any way!
