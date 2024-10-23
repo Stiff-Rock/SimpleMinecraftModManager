@@ -9,5 +9,10 @@
     "offset": "&offset=0",
     "index": "&index=downloads"
   },
-  "downloadPath": "C:\\Users\\Yago\\Downloads"
+  "downloadPath": "C:\\Users\\Yago\\Downloads",
+  "userSettings": {
+    "loader": "fabric",
+    "version": "1.20.4",
+    "autoDownloadDependencies": true
+  }
 }

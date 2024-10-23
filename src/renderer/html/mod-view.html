@@ -12,17 +12,24 @@
 <body>
     <header id="mod-view-header">
         <img id="mod-view-img" src="../img/default-mod-icon.png" />
-        <h1 id="mod-view-title">Mod Title</h1>
-        <select id="game-versions-select" name="Game Version">
-            <option>Loading Data</option>
-        </select>
+        <div id="mod-view-header-info">
+            <h1 id="mod-view-name">Mod Title</h1>
+            <div id="mod-view-header-data">
+                <p id="mod-view-author">Author:</p>
+                <p id="mod-view-downloads">Downloads:</p>
+            </div>
+        </div>
+        <button id="download-btn">Download</button>
     </header>
 
     <hr>
-    
+
+    <select id="game-versions-select" name="Game Version">
+        <option>Loading Data</option>
+    </select>
     <section id="mod-version-list"></section>
 
-    <button id="download-btn">Download</button>
+
 
     <button id="back-btn">Back</button>
     <script src="../js/mod-view.js" defer></script>
