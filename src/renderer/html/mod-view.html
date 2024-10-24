@@ -15,8 +15,14 @@
         <div id="mod-view-header-info">
             <h1 id="mod-view-name">Mod Title</h1>
             <div id="mod-view-header-data">
-                <p id="mod-view-author">Author:</p>
-                <p id="mod-view-downloads">Downloads:</p>
+                <div id="mod-view-author">
+                    <p id="mod-view-author-placeholder">Author:</p>
+                    <p id="mod-view-author-text"></p>
+                </div>
+                <div id="mod-view-downloads">
+                    <p id="mod-view-downloads-placeholder">Downloads:</p>
+                    <p id="mod-view-downloads-text"></p>
+                </div>
             </div>
         </div>
         <button id="download-btn">Download</button>
@@ -24,15 +30,44 @@
 
     <hr>
 
+    <main>
+        <section id="page-content">
+            <div id="tabs">
+                <button class="tab-button active" onclick="">Description</button>
+                <button class="tab-button" onclick="">Versions</button>
+                <button class="tab-button" onclick="">Source</button>
+            </div>
+            <section id="tab-content">
+                <section id="mod-description">
+                    <div id="description-text"></div>
+                </section>
+                <section id="mod-version-list">
+                </section>
+            </section>
+        </section>
+
+        <aside id="mod-section-aside">
+            <section class="info-section">
+                <h1>About</h1>
+                <p id="about-text"></p>
+            </section>
+            <section class="info-section">
+                <h1>Categories</h1>
+                <p id="categories-text"></p>
+            </section>
+            <section class="info-section">
+                <h1>Links</h1>
+                <p id="links-text"></p>
+            </section>
+        </aside>
+    </main>
+
     <select id="game-versions-select" name="Game Version">
         <option>Loading Data</option>
     </select>
-    <section id="mod-version-list"></section>
-
-
 
     <button id="back-btn">Back</button>
-    <script src="../js/mod-view.js" defer></script>
+    <script type="module" src="../js/mod-view.js"></script>
 </body>
 
 </html>

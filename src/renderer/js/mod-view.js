@@ -1,3 +1,5 @@
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
 let loadedData = [];
 let list = '';
 
@@ -13,7 +15,7 @@ async function fetchSelectedMod() {
         const mod = await fetchData.json();
         loadedData[0] = mod.title;
         loadedData[1] = mod.icon_url || '../img/default-mod-icon.png';
-        loadedData[2] = "Downloads: " + mod.downloads;
+        loadedData[2] = mod.downloads.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
         const versionsList = 'https://api.modrinth.com/v2/project/' + modId + '/version';
         const listRawData = await fetch(versionsList);
@@ -22,7 +24,18 @@ async function fetchSelectedMod() {
         const authorId = firstVersion.author_id;
         const userInfo = await fetch("https://api.modrinth.com/v2/user/" + authorId);
         const userJson = await userInfo.json();
-        loadedData[3] = "Author: " + userJson.username
+        loadedData[3] = userJson.username
+
+        loadedData[4] = mod.description + "\n" + mod.body;
+
+        const categories = mod.categories;
+        categories.forEach((category) => {
+            loadedData[5] = category + "\n";
+        });
+
+        loadedData[6] += mod.source_url + "\n";
+        if (mod.wiki_url) loadedData[6] += mod.wiki_url + "\n";
+        if (mod.discord_url) loadedData[6] += mod.discord_url + "\n";
 
     } catch (error) {
         console.error('Error fetching the selected mod:', error);
@@ -36,8 +49,13 @@ async function loadInfoIntoPage() {
 
     document.getElementById('mod-view-name').textContent = loadedData[0];
     document.getElementById('mod-view-img').src = loadedData[1];
-    document.getElementById("mod-view-downloads").textContent = loadedData[2];
-    document.getElementById("mod-view-author").textContent = loadedData[3];
+    document.getElementById("mod-view-downloads-text").textContent = loadedData[2];
+    document.getElementById("mod-view-author-text").textContent = loadedData[3];
+
+    document.getElementById("description-text").innerHTML = marked(loadedData[4]);
+
+    document.getElementById("categories-text").textContent = loadedData[5];
+    document.getElementById("links-text").textContent = loadedData[6];
 
     const select = document.getElementById('game-versions-select');
     select.innerHTML = '';
@@ -51,7 +69,7 @@ async function loadInfoIntoPage() {
             select.appendChild(option);
 
             const modVersionItem = document.createElement('div');
-            modVersionItem.id = 'mod-version-item';
+            modVersionItem.classList.add('mod-version-item');
 
             const gameversionText = document.createElement('p');
             gameversionText.innerHTML = version.game_versions;
