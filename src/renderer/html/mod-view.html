@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SimpleModManager</title>
+    <link rel="stylesheet" href="../css/themes.css">
     <link rel="stylesheet" href="../css/common-styles.css">
     <link rel="stylesheet" href="../css/mod-view.css">
 </head>
@@ -38,11 +39,8 @@
                 <button class="tab-button" onclick="">Source</button>
             </div>
             <section id="tab-content">
-                <section id="mod-description">
-                    <div id="description-text"></div>
-                </section>
-                <section id="mod-version-list">
-                </section>
+                <section id="description-text"></section>
+                <section id="mod-version-list"></section>
             </section>
         </section>
 
@@ -53,7 +51,7 @@
             </section>
             <section class="info-section">
                 <h1>Categories</h1>
-                <p id="categories-text"></p>
+                <div id="categories-text"></div>
             </section>
             <section class="info-section">
                 <h1>Links</h1>
@@ -66,7 +64,10 @@
         <option>Loading Data</option>
     </select>
 
-    <button id="back-btn">Back</button>
+    <footer id="bottom-panel">
+        <button id="back-btn">Back</button>
+    </footer>
+    <script type="module" src="../js/common-functions.js"></script>
     <script type="module" src="../js/mod-view.js"></script>
 </body>
 

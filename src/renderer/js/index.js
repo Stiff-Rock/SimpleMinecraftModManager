@@ -64,6 +64,8 @@ async function fetchMods() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    fetchMods()
+
     /*
     document.getElementById('setPathBtn').addEventListener('click', async () => {
         console.log('Set Path Button clicked');
@@ -77,5 +79,5 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     */
 
-    fetchMods()
+
 })

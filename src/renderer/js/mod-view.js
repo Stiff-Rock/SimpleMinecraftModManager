@@ -54,7 +54,20 @@ async function loadInfoIntoPage() {
 
     document.getElementById("description-text").innerHTML = marked(loadedData[4]);
 
-    document.getElementById("categories-text").textContent = loadedData[5];
+    const catText = document.getElementById("categories-text");
+    if (Array.isArray(loadedData[5])) {
+        loadedData[5].forEach((tag) => {
+            const categoryTag = document.createElement("p");
+            categoryTag.textContent = tag;
+            categoryTag.className = "categories-tag";
+            catText.appendChild(categoryTag);
+        });
+    } else {
+        const categoryTag = document.createElement("p");
+        categoryTag.textContent = loadedData[5];
+        categoryTag.className = "categories-tag";
+        catText.appendChild(categoryTag);
+    }
     document.getElementById("links-text").textContent = loadedData[6];
 
     const select = document.getElementById('game-versions-select');

@@ -6,6 +6,7 @@ const os = require('os');
 
 let configPath = '';
 let config = {};
+let theme = '';
 let userDownloadDirectory = null;
 
 const createWindow = () => {
@@ -26,7 +27,7 @@ function loadConfig() {
     const rawData = fs.readFileSync(configPath, 'utf8');
     config = JSON.parse(rawData);
     userDownloadDirectory = config.downloadPath;
-
+    theme = config.theme;
   } catch (error) {
     console.error('Error loading config:', error);
     dialog.showMessageBox({

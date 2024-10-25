@@ -10,6 +10,7 @@
     "index": "&index=downloads"
   },
   "downloadPath": "C:\\Users\\Yago\\Downloads",
+  "theme": "dark",
   "userSettings": {
     "loader": "fabric",
     "version": "1.20.4",

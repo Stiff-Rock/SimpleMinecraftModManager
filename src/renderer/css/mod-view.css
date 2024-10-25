@@ -9,7 +9,7 @@
     padding: 10px;
     width: 128px;
     height: 128px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
 }
 
@@ -24,6 +24,7 @@
 #mod-view-name {
     font-size: 40px;
     margin: 0;
+    color: var(--text-color);
 }
 
 #mod-view-downloads,
@@ -35,13 +36,13 @@
 #mod-view-downloads-placeholder {
     font-weight: bold;
     margin-right: 10px;
+    color: var(--text-color);
 }
 
 #game-versions-select {
     height: 20px;
     width: 80px;
     margin-left: 20px;
-
     display: none;
 }
 
@@ -53,7 +54,7 @@ main {
 
 #tabs {
     display: flex;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 0;
     padding: 0;
 }
@@ -63,10 +64,10 @@ main {
     padding: 10px 20px;
     cursor: pointer;
     font-size: 16px;
-    border: 1px solid;
-    border-color: #ccc;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     margin-bottom: -1px;
-    background-color: #f8f8f8;
+    background-color: var(--item-background-color);
     transition: all 0.3s ease;
 }
 
@@ -86,19 +87,28 @@ main {
 #tab-content {
     display: flex;
     flex-direction: column;
-    border: 1px solid;
+    border: 1px solid var(--border-color);
     border-top: 0;
-    border-color: #ccc;
     padding: 10px;
 }
 
 .tab-button:hover {
-    background-color: #eee;
+    background-color: var(--item-hover-background-color);
 }
 
 .tab-button.active {
-    background-color: white;
-    border-color: #ccc;
+    background-color: var(--item-background-color);
+    border-color: var(--border-color);
+}
+
+#description-text img {
+    width: 80%;
+    height: auto;
+}
+
+#description-text a img {
+    width: 20%;
+    height: auto;
 }
 
 #mod-section-aside {
@@ -111,14 +121,45 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid;
-    border-color: #ccc;
+    border: 1px solid var(--border-color);
     padding: 10px;
     margin-bottom: 20px;
+    height: auto;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .info-section h1 {
     margin: 0;
+    margin-bottom: 2px;
+    color: var(--text-color);
+    width: 100%;
+    word-wrap: break-word;
+}
+
+#about-text,
+#categories-text,
+#links-text {
+    width: 100%;
+    height: auto;
+    overflow-wrap: break-word;
+    padding: 5px;
+}
+
+#categories-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.categories-tag {
+    padding: 3px;
+    margin: 2px;
+    color: var(--contrast-text-color);
+    background-color: rgb(219, 219, 219);
+    border-radius: 5px;
 }
 
 #mod-version-list {
@@ -129,10 +170,10 @@ main {
 .mod-version-item {
     display: flex;
     align-items: center;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     padding: 10px;
     margin-bottom: 10px;
-    background-color: #fff;
+    background-color: var(--item-background-color);
     border-radius: 5px;
     width: 700px;
     height: 50px;
@@ -140,9 +181,21 @@ main {
     justify-content: space-between;
 }
 
-#back-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
+#bottom-panel {
     z-index: 1000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    background-color: var(--footer-color);
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border: 1px solid black;
+    border-bottom: 0;
+}
+
+#back-btn {
+    color: var(--contrast-text-color);
 }
