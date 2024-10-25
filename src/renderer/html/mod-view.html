@@ -34,9 +34,8 @@
     <main>
         <section id="page-content">
             <div id="tabs">
-                <button class="tab-button active" onclick="">Description</button>
-                <button class="tab-button" onclick="">Versions</button>
-                <button class="tab-button" onclick="">Source</button>
+                <button class="tab-button" id="description-button" onclick="showDescriptionTab()">Description</button>
+                <button class="tab-button" id="versions-button" onclick="showVersionsTab()">Versions</button>
             </div>
             <section id="tab-content">
                 <section id="description-text"></section>
@@ -53,9 +52,8 @@
                 <h1>Categories</h1>
                 <div id="categories-text"></div>
             </section>
-            <section class="info-section">
+            <section class="info-section" id="links-div">
                 <h1>Links</h1>
-                <p id="links-text"></p>
             </section>
         </aside>
     </main>

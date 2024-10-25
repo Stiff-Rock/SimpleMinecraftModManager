@@ -19,6 +19,10 @@ a {
     color: var(--link-color);
 }
 
+hr {
+    color: var(--border-color);
+}
+
 button {
     padding: 5px 10px;
     font-size: 16px;

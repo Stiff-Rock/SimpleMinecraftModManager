@@ -33,9 +33,12 @@ async function fetchSelectedMod() {
             loadedData[5] = category + "\n";
         });
 
-        loadedData[6] += mod.source_url + "\n";
-        if (mod.wiki_url) loadedData[6] += mod.wiki_url + "\n";
-        if (mod.discord_url) loadedData[6] += mod.discord_url + "\n";
+        let urls = [];
+        urls[0] = mod.source_url;
+        if (mod.wiki_url) urls[1] = mod.wiki_url;
+        if (mod.discord_url) urls[2] = mod.discord_url;
+
+        loadedData[6] = urls;
 
     } catch (error) {
         console.error('Error fetching the selected mod:', error);
@@ -68,7 +71,18 @@ async function loadInfoIntoPage() {
         categoryTag.className = "categories-tag";
         catText.appendChild(categoryTag);
     }
-    document.getElementById("links-text").textContent = loadedData[6];
+
+    const linkDiv = document.getElementById("links-div");
+    const urls = loadedData[6];
+    urls.forEach((linkUrl) => {
+        const link = document.createElement("a");
+        link.id = "links-text";
+        link.href = linkUrl;
+        link.textContent = linkUrl;
+        
+        linkDiv.appendChild(link);
+    });
+    
 
     const select = document.getElementById('game-versions-select');
     select.innerHTML = '';
@@ -116,9 +130,29 @@ async function loadInfoIntoPage() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    loadInfoIntoPage();
+    await loadInfoIntoPage();
 
+    document.querySelectorAll("a").forEach(link => {
+        link.target = "_blank";
+    });
+    
     document.getElementById("back-btn").addEventListener("click", () => {
         window.location.href = "index.html";
     });
 });
+
+const descriptionTab = document.getElementById("description-text");
+const versionsTab = document.getElementById("mod-version-list");
+
+const descriptionButton = document.getElementById("description-button");
+const versionsButton = document.getElementById("versions-button");
+
+descriptionButton.onclick = function() {
+    descriptionTab.style.display = "block";
+    versionsTab.style.display = "none"; 
+};
+
+versionsButton.onclick = function() {
+    versionsTab.style.display = "block";
+    descriptionTab.style.display = "none";
+}

@@ -4,9 +4,13 @@
     --second-background-color: #e7e7e7;
     --hover-background-color: #cccccc;
     --text-color: #333333;
+    --contrast-text-color: #ebebeb;
     --link-color: rgb(53, 141, 255);
     --border-color: #CCCCCC;
     --footer-color: #ffffff;
+    --button-hover: #eee;
+    --button-active: white;
+    --button-boder: #ccc;
 }
 
 .dark-mode {
@@ -18,4 +22,7 @@
     --link-color: rgb(60, 84, 218);
     --border-color: #636363;
     --footer-color: #2a2a2a;
+    --button-hover: #3a3a3a;
+    --button-active: #1e1e1e;
+    --button-border: #636363; 
 }
