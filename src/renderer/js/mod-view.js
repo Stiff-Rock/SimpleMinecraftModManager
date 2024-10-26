@@ -28,9 +28,16 @@ async function fetchSelectedMod() {
 
         loadedData[4] = mod.description + "\n" + mod.body;
 
+        let aboutInfo = [];
+        aboutInfo[0] = "Published: " + mod.published;
+        aboutInfo[1] = "Updated:  " + mod.updated;
+        if (mod.license?.name) aboutInfo[2] = "License: " + mod.license.name;
+
+        loadedData[5] = aboutInfo;
+
         const categories = mod.categories;
         categories.forEach((category) => {
-            loadedData[5] = category + "\n";
+            loadedData[6] = category + "\n";
         });
 
         let urls = [];
@@ -38,7 +45,7 @@ async function fetchSelectedMod() {
         if (mod.wiki_url) urls[1] = mod.wiki_url;
         if (mod.discord_url) urls[2] = mod.discord_url;
 
-        loadedData[6] = urls;
+        loadedData[7] = urls;
 
     } catch (error) {
         console.error('Error fetching the selected mod:', error);
@@ -57,9 +64,17 @@ async function loadInfoIntoPage() {
 
     document.getElementById("description-text").innerHTML = marked(loadedData[4]);
 
+    const aboutSection = document.getElementById("about-text");
+    const aboutEntries = loadedData[5];
+    aboutEntries.forEach((aboutText) => {
+        const text = document.createElement("p");
+        text.textContent = aboutText;
+        aboutSection.appendChild(text);
+    });
+
     const catText = document.getElementById("categories-text");
-    if (Array.isArray(loadedData[5])) {
-        loadedData[5].forEach((tag) => {
+    if (Array.isArray(loadedData[6])) {
+        loadedData[6].forEach((tag) => {
             const categoryTag = document.createElement("p");
             categoryTag.textContent = tag;
             categoryTag.className = "categories-tag";
@@ -67,22 +82,22 @@ async function loadInfoIntoPage() {
         });
     } else {
         const categoryTag = document.createElement("p");
-        categoryTag.textContent = loadedData[5];
+        categoryTag.textContent = loadedData[6];
         categoryTag.className = "categories-tag";
         catText.appendChild(categoryTag);
     }
 
     const linkDiv = document.getElementById("links-div");
-    const urls = loadedData[6];
+    const urls = loadedData[7];
     urls.forEach((linkUrl) => {
         const link = document.createElement("a");
         link.id = "links-text";
         link.href = linkUrl;
         link.textContent = linkUrl;
-        
+
         linkDiv.appendChild(link);
     });
-    
+
 
     const select = document.getElementById('game-versions-select');
     select.innerHTML = '';
@@ -135,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll("a").forEach(link => {
         link.target = "_blank";
     });
-    
+
     document.getElementById("back-btn").addEventListener("click", () => {
         window.location.href = "index.html";
     });
@@ -147,12 +162,18 @@ const versionsTab = document.getElementById("mod-version-list");
 const descriptionButton = document.getElementById("description-button");
 const versionsButton = document.getElementById("versions-button");
 
-descriptionButton.onclick = function() {
+descriptionButton.onclick = function () {
     descriptionTab.style.display = "block";
-    versionsTab.style.display = "none"; 
+    versionsTab.style.display = "none";
+
+    descriptionButton.classList.add("active");
+    versionsButton.classList.remove("active");
 };
 
-versionsButton.onclick = function() {
+versionsButton.onclick = function () {
     versionsTab.style.display = "block";
     descriptionTab.style.display = "none";
+
+    versionsButton.classList.add("active");
+    descriptionButton.classList.remove("active");
 }

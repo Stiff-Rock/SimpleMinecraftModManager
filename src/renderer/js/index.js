@@ -34,10 +34,19 @@ async function fetchMods() {
             modImg.classList.add('mod-img');
             modItem.appendChild(modImg);
 
+            const modInfoContainer = document.createElement('div');
+            modInfoContainer.classList.add('mod-info-container');
+            modItem.appendChild(modInfoContainer);
+
             const modName = document.createElement('p');
             modName.classList.add('mod-title');
             modName.textContent = mod.title;
-            modItem.appendChild(modName);
+            modInfoContainer.appendChild(modName);
+
+            const modDescription = document.createElement('p');
+            modDescription.classList.add('mod-description');
+            modDescription.textContent = mod.description;
+            modInfoContainer.appendChild(modDescription);
 
             /*
             const downloadButton = document.createElement('button');
