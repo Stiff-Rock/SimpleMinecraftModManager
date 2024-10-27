@@ -8,10 +8,13 @@
     <link rel="stylesheet" href="../css/themes.css">
     <link rel="stylesheet" href="../css/common-styles.css">
     <link rel="stylesheet" href="../css/mod-view.css">
+    <link rel="stylesheet" href="../css/header.css">
 </head>
 
 <body>
-    <header id="mod-view-header">
+    <header></header>
+    
+    <section id="mod-view-header">
         <img id="mod-view-img" src="../img/default-mod-icon.png" />
         <div id="mod-view-header-info">
             <h1 id="mod-view-name">Mod Title</h1>
@@ -27,7 +30,7 @@
             </div>
         </div>
         <button id="download-btn">Download</button>
-    </header>
+    </section>
 
     <hr>
 
@@ -60,10 +63,7 @@
     <select id="game-versions-select" name="Game Version">
         <option>Loading Data</option>
     </select>
-
-    <footer id="bottom-panel">
-        <button id="back-btn">Back</button>
-    </footer>
+    
     <script type="module" src="../js/common-functions.js"></script>
     <script type="module" src="../js/mod-view.js"></script>
 </body>

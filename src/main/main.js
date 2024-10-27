@@ -26,8 +26,8 @@ function loadConfig() {
     configPath = path.join(__dirname, '..', 'config', 'config.json');
     const rawData = fs.readFileSync(configPath, 'utf8');
     config = JSON.parse(rawData);
-    userDownloadDirectory = config.downloadPath;
-    theme = config.theme;
+    userDownloadDirectory = config.userSettings.downloadPath;
+    theme = config.userSettings.theme;
   } catch (error) {
     console.error('Error loading config:', error);
     dialog.showMessageBox({
@@ -48,17 +48,31 @@ async function selectDirectory() {
     properties: ['openDirectory'],
     defaultPath: path.join(os.homedir()),
   });
+
   if (result.filePaths.length > 0) {
-    userDownloadDirectory = result.filePaths[0];
-    config.downloadPath = userDownloadDirectory;
+    const userDownloadDirectory = result.filePaths[0];
+    config.userSettings.downloadPath = userDownloadDirectory;
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    return userDownloadDirectory;
   }
+
+  return null;
 }
 
 ipcMain.handle('dialog:openDirectory', async () => {
-  selectDirectory()
-  if (!userDownloadDirectory) {
+  const selectedPath = await selectDirectory();
+  if (!selectedPath) {
     return { status: 'error', msg: 'Download directory not selected.' };
+  }
+  return { status: 'success', path: selectedPath };
+});
+
+ipcMain.handle('setUserSettings', async (event, newConfig) => {
+  try {
+    config = newConfig;
+    fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
+  } catch (error) {
+    console.error('Error writing config file:', error);
   }
 });
 

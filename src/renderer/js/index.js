@@ -1,3 +1,5 @@
+import { downloadQuery } from './common-functions.js';
+
 async function fetchMods() {
     try {
         const config = await window.api.getConfig();
@@ -24,19 +26,22 @@ async function fetchMods() {
             const modItem = document.createElement('div');
             modItem.classList.add('mod-item');
 
-            modItem.addEventListener('click', () => {
+            const modContent = document.createElement('div');
+            modContent.classList.add('mod-content');
+            modContent.addEventListener('click', () => {
                 localStorage.setItem('selectedMod', mod.project_id);
                 window.location.href = 'mod-view.html';
             });
+            modItem.appendChild(modContent);
 
             const modImg = document.createElement('img');
             modImg.src = mod.icon_url ?? '../img/default-mod-icon.png';
             modImg.classList.add('mod-img');
-            modItem.appendChild(modImg);
+            modContent.appendChild(modImg);
 
             const modInfoContainer = document.createElement('div');
             modInfoContainer.classList.add('mod-info-container');
-            modItem.appendChild(modInfoContainer);
+            modContent.appendChild(modInfoContainer);
 
             const modName = document.createElement('p');
             modName.classList.add('mod-title');
@@ -48,17 +53,19 @@ async function fetchMods() {
             modDescription.textContent = mod.description;
             modInfoContainer.appendChild(modDescription);
 
-            /*
+            const buttonDiv = document.createElement('div');
+            buttonDiv.classList.add('download-section')
+            modItem.appendChild(buttonDiv);
+
             const downloadButton = document.createElement('button');
             downloadButton.classList.add('download-btn');
             downloadButton.textContent = 'Download';
             downloadButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Download logic
+                e.stopImmediatePropagation;
+                downloadQuery(mod.project_id);
             });
-            modItem.appendChild(downloadButton);
-            */
-           
+            buttonDiv.appendChild(downloadButton);
+
             modList.appendChild(modItem);
         });
 

@@ -1,0 +1,37 @@
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+#pfp {
+    width: 128px;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 5px;
+    transition: all 0.2s ease-in;
+    cursor: pointer;
+}
+
+#pfp:hover {
+    background-color: var(--second-background-color);
+}
+
+.option {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+label {
+    color: var(--text-color);
+}
+
+select {
+    color: var(--contrast-text-color);
+    height: 30px;
+}

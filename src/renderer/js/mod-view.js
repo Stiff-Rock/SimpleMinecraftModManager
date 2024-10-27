@@ -1,11 +1,13 @@
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+import { downloadQuery } from './common-functions.js';
 
 let loadedData = [];
 let list = '';
+let modId = '';
 
 async function fetchSelectedMod() {
     try {
-        const modId = localStorage.getItem('selectedMod');
+        modId = localStorage.getItem('selectedMod');
         if (modId == null) {
             throw Error('Selected mod info not found in local storage');
         }
@@ -29,8 +31,12 @@ async function fetchSelectedMod() {
         loadedData[4] = mod.description + "\n" + mod.body;
 
         let aboutInfo = [];
-        aboutInfo[0] = "Published: " + mod.published;
-        aboutInfo[1] = "Updated:  " + mod.updated;
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+        aboutInfo[0] = "Published: " + formatDate(mod.published);
+        aboutInfo[1] = "Updated:  " + formatDate(mod.updated);
         if (mod.license?.name) aboutInfo[2] = "License: " + mod.license.name;
 
         loadedData[5] = aboutInfo;
@@ -98,63 +104,41 @@ async function loadInfoIntoPage() {
         linkDiv.appendChild(link);
     });
 
-
     const select = document.getElementById('game-versions-select');
     select.innerHTML = '';
     const modVersionList = document.getElementById('mod-version-list');
     modVersionList.innerHTML = '';
+    
+    const response = await fetch('../html/bones/mod-version-item.html');
+    const templateHTML = await response.text();
+    const template = document.createElement('template');
+    template.innerHTML = templateHTML;
+    
     list.forEach((version) => {
+        // The regex expression ensures that no snapshots are shown.
         if (/^[0-9]+(\.[0-9]+)*$/.test(version.game_versions)) {
+            // Add option to the version select
             const option = document.createElement('option');
             option.value = version.game_versions;
             option.innerHTML = version.game_versions;
             select.appendChild(option);
 
-            const modVersionItem = document.createElement('div');
-            modVersionItem.classList.add('mod-version-item');
+            // Add each version card to the list
+            const modVersionItem = template.content.cloneNode(true);
+            modVersionItem.querySelector('.game-version').innerHTML = version.game_versions;
+            console.log(version.game_versions)
+            modVersionItem.querySelector('.mod-name').innerHTML = version.name;
+            modVersionItem.querySelector('.loader').innerHTML = version.loaders[0];
 
-            const gameversionText = document.createElement('p');
-            gameversionText.innerHTML = version.game_versions;
-            modVersionItem.appendChild(gameversionText)
-
-            const modVersionText = document.createElement('p');
-            modVersionText.innerHTML = version.name;
-            modVersionItem.appendChild(modVersionText)
-
-            const loaderText = document.createElement('p');
-            loaderText.innerHTML = version.loaders[0];
-            modVersionItem.appendChild(loaderText)
-
-            const downloadButton = document.createElement('button');
-            downloadButton.innerHTML = 'Download';
+            const downloadButton = modVersionItem.querySelector('.download-button');
             downloadButton.addEventListener("click", async () => {
-                try {
-                    const url = version.files[0].url;
-                    const fileName = version.files[0].filename ?? path.basename(url);
-                    await window.api.downloadFile(url, fileName);
-                } catch (error) {
-                    console.error('Error invoking downloadFile:', error);
-                    alert(`Download failed: ${error.message}`);
-                }
+                downloadSelectedMod(version);
             });
-            modVersionItem.appendChild(downloadButton)
 
             modVersionList.appendChild(modVersionItem);
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadInfoIntoPage();
-
-    document.querySelectorAll("a").forEach(link => {
-        link.target = "_blank";
-    });
-
-    document.getElementById("back-btn").addEventListener("click", () => {
-        window.location.href = "index.html";
-    });
-});
 
 const descriptionTab = document.getElementById("description-text");
 const versionsTab = document.getElementById("mod-version-list");
@@ -177,3 +161,19 @@ versionsButton.onclick = function () {
     versionsButton.classList.add("active");
     descriptionButton.classList.remove("active");
 }
+
+function downloadSelectedMod(version) {
+    console.log("Implement this: " + version);
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadInfoIntoPage();
+
+    document.querySelectorAll("a").forEach(link => {
+        link.target = "_blank";
+    });
+
+    document.getElementById("download-btn").addEventListener("click", () => {
+        downloadQuery(modId);
+    });
+});
