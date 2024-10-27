@@ -43,6 +43,14 @@ ipcMain.handle('get-config', async () => {
   return config;
 });
 
+ipcMain.handle('dialog:openDirectory', async () => {
+  const selectedPath = await selectDirectory();
+  if (!selectedPath) {
+    return { status: 'error', msg: 'Download directory not selected.' };
+  }
+  return { status: 'success', path: selectedPath };
+});
+
 async function selectDirectory() {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
@@ -52,29 +60,24 @@ async function selectDirectory() {
   if (result.filePaths.length > 0) {
     const userDownloadDirectory = result.filePaths[0];
     config.userSettings.downloadPath = userDownloadDirectory;
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    setUserSettings(config);
     return userDownloadDirectory;
   }
-
   return null;
 }
 
-ipcMain.handle('dialog:openDirectory', async () => {
-  const selectedPath = await selectDirectory();
-  if (!selectedPath) {
-    return { status: 'error', msg: 'Download directory not selected.' };
-  }
-  return { status: 'success', path: selectedPath };
+ipcMain.handle('setUserSettings', async (event, newConfig) => {
+  setUserSettings(newConfig)
 });
 
-ipcMain.handle('setUserSettings', async (event, newConfig) => {
+function setUserSettings(newConfig) {
   try {
     config = newConfig;
     fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
   } catch (error) {
     console.error('Error writing config file:', error);
   }
-});
+}
 
 ipcMain.handle('download-file', async (event, url, fileName) => {
   if (!userDownloadDirectory) {
@@ -129,6 +132,19 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
     });
   });
 });
+
+ipcMain.handle('showErrorDialog', async (event, message) => {
+  showErrorDialog(message)
+});
+
+function showErrorDialog(message) {
+  dialog.showMessageBox({
+    type: 'error',
+    title: 'Error',
+    message: message,
+    buttons: ['OK']
+  });
+}
 
 app.whenReady().then(() => {
   createWindow()

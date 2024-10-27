@@ -7,29 +7,39 @@ let modId = '';
 
 async function fetchSelectedMod() {
     try {
+        // Retrieve the selected mod in the index.html
         modId = localStorage.getItem('selectedMod');
         if (modId == null) {
             throw Error('Selected mod info not found in local storage');
         }
 
+        // Fetch the mod project info json
         const projectUrl = 'https://api.modrinth.com/v2/project/' + modId;
         const fetchData = await fetch(projectUrl);
         const mod = await fetchData.json();
+
+        // Store the Title, Mod Icon and download count.
         loadedData[0] = mod.title;
         loadedData[1] = mod.icon_url || '../img/default-mod-icon.png';
         loadedData[2] = mod.downloads.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
+        // Fetch the list of versions for the mod
         const versionsList = 'https://api.modrinth.com/v2/project/' + modId + '/version';
         const listRawData = await fetch(versionsList);
         list = await listRawData.json();
-        const firstVersion = list[0];
-        const authorId = firstVersion.author_id;
+
+        // Fetch the author information to display
+        const authorId = list[0].author_id;
         const userInfo = await fetch("https://api.modrinth.com/v2/user/" + authorId);
         const userJson = await userInfo.json();
+
+        // Store the author's username
         loadedData[3] = userJson.username
 
+        // Store the mod's description and the mod body text
         loadedData[4] = mod.description + "\n" + mod.body;
 
+        // Store published and updated dates and the project's license
         let aboutInfo = [];
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -38,19 +48,19 @@ async function fetchSelectedMod() {
         aboutInfo[0] = "Published: " + formatDate(mod.published);
         aboutInfo[1] = "Updated:  " + formatDate(mod.updated);
         if (mod.license?.name) aboutInfo[2] = "License: " + mod.license.name;
-
         loadedData[5] = aboutInfo;
 
+        // Store mod's categories
         const categories = mod.categories;
         categories.forEach((category) => {
             loadedData[6] = category + "\n";
         });
 
+        // Store mod's external urls
         let urls = [];
         urls[0] = mod.source_url;
         if (mod.wiki_url) urls[1] = mod.wiki_url;
         if (mod.discord_url) urls[2] = mod.discord_url;
-
         loadedData[7] = urls;
 
     } catch (error) {
@@ -67,7 +77,6 @@ async function loadInfoIntoPage() {
     document.getElementById('mod-view-img').src = loadedData[1];
     document.getElementById("mod-view-downloads-text").textContent = loadedData[2];
     document.getElementById("mod-view-author-text").textContent = loadedData[3];
-
     document.getElementById("description-text").innerHTML = marked(loadedData[4]);
 
     const aboutSection = document.getElementById("about-text");
@@ -108,12 +117,12 @@ async function loadInfoIntoPage() {
     select.innerHTML = '';
     const modVersionList = document.getElementById('mod-version-list');
     modVersionList.innerHTML = '';
-    
+
     const response = await fetch('../html/bones/mod-version-item.html');
     const templateHTML = await response.text();
     const template = document.createElement('template');
     template.innerHTML = templateHTML;
-    
+
     list.forEach((version) => {
         // The regex expression ensures that no snapshots are shown.
         if (/^[0-9]+(\.[0-9]+)*$/.test(version.game_versions)) {
@@ -123,13 +132,14 @@ async function loadInfoIntoPage() {
             option.innerHTML = version.game_versions;
             select.appendChild(option);
 
-            // Add each version card to the list
+            // Create each version card
             const modVersionItem = template.content.cloneNode(true);
+            modVersionItem.querySelector('.game-version_type').innerHTML = version.version_type;
             modVersionItem.querySelector('.game-version').innerHTML = version.game_versions;
-            console.log(version.game_versions)
             modVersionItem.querySelector('.mod-name').innerHTML = version.name;
             modVersionItem.querySelector('.loader').innerHTML = version.loaders[0];
 
+            // Configure the download button
             const downloadButton = modVersionItem.querySelector('.download-button');
             downloadButton.addEventListener("click", async () => {
                 downloadSelectedMod(version);
@@ -140,6 +150,13 @@ async function loadInfoIntoPage() {
     });
 }
 
+async function downloadSelectedMod(version) {
+    const url = version.files[0].url;
+    const fileName = version.files[0].filename ?? path.basename(url);
+    await window.api.downloadFile(url, fileName);
+}
+
+// Tab's functionality
 const descriptionTab = document.getElementById("description-text");
 const versionsTab = document.getElementById("mod-version-list");
 
@@ -162,16 +179,14 @@ versionsButton.onclick = function () {
     descriptionButton.classList.remove("active");
 }
 
-function downloadSelectedMod(version) {
-    console.log("Implement this: " + version);
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     await loadInfoIntoPage();
+
 
     document.querySelectorAll("a").forEach(link => {
         link.target = "_blank";
     });
+
 
     document.getElementById("download-btn").addEventListener("click", () => {
         downloadQuery(modId);

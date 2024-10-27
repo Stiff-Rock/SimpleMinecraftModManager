@@ -1,0 +1,47 @@
+<head>
+    <style>
+        #pagination {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #pages {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0 10px;
+        }
+
+        #pages li {
+            margin: 0 5px;
+        }
+
+        .pagination-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: var(--text-color);
+            background-color: transparent;
+            transition: background-color 0.3s;
+        }
+
+        .pagination-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .activePage {
+            background-color: var(--button-hover);
+        }
+    </style>
+</head>
+<section id="pagination">
+    <button class="pagination-button" id="prev-btn">&lt;</button>
+    <ul id="pages">
+        <li><button class="pagination-button activePage">1</button></li>
+    </ul>
+    <button class="pagination-button" id="next-btn">&gt;</button>
+</section>

@@ -1,26 +1,36 @@
-import { downloadQuery } from './common-functions.js';
+import { downloadQuery, insertPagination } from './common-functions.js';
 
-async function fetchMods() {
+let currentPage = 1;
+let query = '';
+
+async function fetchMods(page = 1) {
     try {
-        const config = await window.api.getConfig();
-        const apiUrl = config.liveApiUrl;
-        const endpoints = config.endpoints;
-        const query = '';
+        if (!page == 0) currentPage = page;
 
-        const url = apiUrl
-            + endpoints.search
-            + query
-            + endpoints.facets
-            + '[' + endpoints.onlyMods + ']'
-            + endpoints.limit
-            + endpoints.offset
-            + endpoints.index;
+        const itemsPerPage = 20;
+        const offsetAmount = (currentPage - 1) * itemsPerPage;
+
+        const url = "https://api.modrinth.com/v2"
+            + "/search?query=" + query
+            + "&facets=[" + "[%22project_type:mod%22]" + "]"
+            + "&limit=" + itemsPerPage
+            + "&offset=" + offsetAmount
+            + "&index=downloads";
 
         const response = await fetch(url);
         const data = await response.json();
+        const totalItems = data.total_hits;
         const mods = data.hits;
-        const modList = document.getElementById('modList');
+
+        const modList = document.getElementById('mod-list');
         modList.innerHTML = '';
+
+        if (mods.length === 0) {
+            const noModsMessage = document.createElement('p');
+            noModsMessage.textContent = 'No mods found.';
+            modList.appendChild(noModsMessage);
+            return;
+        }
 
         mods.forEach(mod => {
             const modItem = document.createElement('div');
@@ -68,32 +78,12 @@ async function fetchMods() {
 
             modList.appendChild(modItem);
         });
-
-        if (mods.length === 0) {
-            const noModsMessage = document.createElement('p');
-            noModsMessage.textContent = 'No mods found.';
-            modList.appendChild(noModsMessage);
-        }
+        await insertPagination(modList, totalItems, currentPage, itemsPerPage, fetchMods, true);
     } catch (error) {
         console.error('Error fetching mods:', error);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchMods()
-
-    /*
-    document.getElementById('setPathBtn').addEventListener('click', async () => {
-        console.log('Set Path Button clicked');
-        const path = await window.api.setDownloadPath()
-        console.log('Selected path:', path);
-        if (path) {
-            alert(`Download path set to: ${path}`)
-        } else {
-            alert('Download path selection was canceled.')
-        }
-    })
-    */
-
-
+    fetchMods();
 })
