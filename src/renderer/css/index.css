@@ -32,6 +32,22 @@ input:focus {
     border-radius: 5px;
 }
 
+.tag-container {
+    display: flex;
+    align-items: center;
+}
+
+.tag {
+    width: 100%;
+    color: var(--text-color);
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px; 
+}
+
 #mod-list {
     display: flex;
     flex-direction: column;
@@ -55,7 +71,7 @@ input:focus {
 
 .mod-content {
     display: flex;
-    align-items: center;  
+    align-items: center;
     cursor: pointer;
     width: 70%;
     height: 100%;
