@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body id="body">
+</body>
+<script defer>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const body = document.getElementById("body");
+
+        try {
+            const response = await fetch("https://api.modrinth.com/v2/tag/loader");
+            const data = await response.json();
+
+            const filter = ["mod", "project", "modpack"];
+
+            data.forEach(element => {
+                if (filter.every(type => element.supported_project_types.includes(type))) {
+                    const svgContainer = document.createElement('div');
+                    svgContainer.style.width = "128px";
+                    svgContainer.style.height = "auto";
+                    svgContainer.title = element.name;
+                    svgContainer.innerHTML = element.icon;
+                    body.appendChild(svgContainer);
+                }
+            });
+        } catch (error) {
+            console.error("Failed to fetch or display the icon:", error);
+        }
+    });
+</script>
+
+</html>

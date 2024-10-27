@@ -1,4 +1,5 @@
 import { loadTheme } from './common-functions.js';
+import { populateSelectPomise } from './game-settigns-fetch.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -9,33 +10,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         const autoDownloadDependenciesSetting = config.userSettings.autoDownloadDependencies;
         const theme = config.userSettings.theme;
 
-        document.getElementById('game-version').value = userVersion || '';
-        document.getElementById('loader').value = userLoader || '';
-        document.getElementById('autoDownloadDependencies').value = autoDownloadDependenciesSetting;
-        document.getElementById('theme').value = theme || 'sys';
+        const gameVersionSelect = document.getElementById('game-version-select');
+        const loaderSelect = document.getElementById('loader-select');
+        const autoDownloadDependenciesSelect = document.getElementById('autoDownloadDependencies');
+        const themeSelect = document.getElementById('theme');
 
-        document.getElementById('game-version').addEventListener('change', (event) => {
+        await populateSelectPomise;
+
+        gameVersionSelect.value = userVersion || '';
+        loaderSelect.value = userLoader || '';
+        autoDownloadDependenciesSelect.value = autoDownloadDependenciesSetting;
+        themeSelect.value = theme || 'sys';
+
+        gameVersionSelect.addEventListener('change', (event) => {
             config.userSettings.version = event.target.value;
             window.api.setUserSettings(config);
         });
 
-        document.getElementById('loader').addEventListener('change', (event) => {
+        loaderSelect.addEventListener('change', (event) => {
             config.userSettings.loader = event.target.value;
             window.api.setUserSettings(config);
         });
 
-        document.getElementById('autoDownloadDependencies').addEventListener('change', (event) => {
+        autoDownloadDependenciesSelect.addEventListener('change', (event) => {
             config.userSettings.autoDownloadDependencies = (event.target.value === 'true');
             window.api.setUserSettings(config);
         });
 
-        document.getElementById('theme').addEventListener('change', (event) => {
+        themeSelect.addEventListener('change', (event) => {
             config.userSettings.theme = event.target.value;
             window.api.setUserSettings(config);
             loadTheme();
             location.reload();
         });
-
     } catch (error) {
         console.error('Failed to load config:', error);
     }

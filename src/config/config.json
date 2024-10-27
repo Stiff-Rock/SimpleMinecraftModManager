@@ -2,8 +2,8 @@
   "userSettings": {
     "downloadPath": "C:\\Users\\Yago\\Downloads",
     "theme": "dark",
-    "loader": "fabric",
-    "version": "1.21",
+    "loader": "",
+    "version": "",
     "autoDownloadDependencies": true
   }
 }

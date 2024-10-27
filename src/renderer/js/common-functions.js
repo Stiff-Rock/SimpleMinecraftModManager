@@ -1,3 +1,5 @@
+import { populateSelects } from './game-settigns-fetch.js';
+
 let config = {};
 let theme = '';
 let userLoader = '';
@@ -14,7 +16,7 @@ const loadConfigPromise = loadConfig();
 
 async function loadHeader() {
     try {
-        const response = await fetch('../html/header.html');
+        const response = await fetch('../html/bones/header.html');
         if (!response.ok) throw new Error('Network response was not ok');
         const headerHTML = await response.text();
         document.querySelector('header').innerHTML = headerHTML;
@@ -198,6 +200,8 @@ async function showGameSettingsModal() {
     modal.classList.add('modal');
     modal.appendChild(template.content.cloneNode(true));
     document.body.appendChild(modal);
+
+    await populateSelects();
 
     await new Promise((resolve, reject) => {
         const confirmButton = modal.querySelector('button');
