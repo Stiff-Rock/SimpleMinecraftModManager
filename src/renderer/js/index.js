@@ -32,6 +32,39 @@ async function fetchMods(page = 1) {
             return;
         }
 
+        const queryContainer = document.createElement('div');
+        queryContainer.style.display = "flex";
+        queryContainer.style.alignItems = "center";
+        queryContainer.style.height = "fit-content"
+        queryContainer.style.width = "100%"
+        queryContainer.style.gap = "20px"
+
+        const input = document.createElement('input');
+        input.id = 'querySearchInput';
+        input.placeholder = 'Search mods...';
+        input.value = query;
+        input.type = 'text';
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                query = input.value;
+                fetchMods(0);
+            }
+        });
+        queryContainer.appendChild(input);
+
+        const submitButton = document.createElement('button');
+        submitButton.id = 'submitButton';
+        submitButton.textContent = 'Submit';
+        submitButton.addEventListener('click', (event) => {
+            query = input.value;
+            fetchMods(0);
+        });
+
+        queryContainer.appendChild(submitButton);
+
+        modList.appendChild(queryContainer);
+
         mods.forEach(mod => {
             const modItem = document.createElement('div');
             modItem.classList.add('mod-item');

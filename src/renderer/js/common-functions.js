@@ -115,7 +115,7 @@ async function downloadQuery(modId) {
 }
 export { downloadQuery };
 
-async function insertPagination(container, totalItems, currentPage, itemsPerPage, loadingFunction, addToTop = false) {
+async function insertPagination(container, totalItems, currentPage, itemsPerPage, loadingFunction) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const responseHtml = await fetch('../html/bones/pagination.html');
     const paginationTemplateHTML = await responseHtml.text();
@@ -138,39 +138,35 @@ async function insertPagination(container, totalItems, currentPage, itemsPerPage
         pagesContainer.appendChild(li);
     }
 
-    function createPaginationButtons(pagesContainer) {
-        pagesContainer.innerHTML = '';
+    container.appendChild(paginationTemplate.content.cloneNode(true));
+    const pagesContainer = container.querySelector('#pages');
+    pagesContainer.innerHTML = '';
 
-        if (currentPage > 1) {
-            createButton(1, pagesContainer);
-            
-            const separator = document.createElement('p');
-            separator.textContent = "...";
-            separator.style.margin = "0";
-            separator.style.marginLeft = "5px";
-            separator.style.marginRight = "5px";
-            pagesContainer.appendChild(separator);
-        }
+    if (currentPage > 1) {
+        createButton(1, pagesContainer);
 
-        for (let page = currentPage; page <= currentPage + 4 && page <= totalPages; page++) {
-            createButton(page, pagesContainer, page === currentPage);
-        }
-
-        if (currentPage < totalPages) {
-            const separator = document.createElement('p');
-            separator.textContent = "...";
-            separator.style.margin = "0";
-            separator.style.marginLeft = "5px";
-            separator.style.marginRight = "5px";
-            pagesContainer.appendChild(separator);
-
-            createButton(totalPages, pagesContainer);
-        }
+        const separator = document.createElement('p');
+        separator.textContent = "...";
+        separator.style.margin = "0";
+        separator.style.marginLeft = "5px";
+        separator.style.marginRight = "5px";
+        pagesContainer.appendChild(separator);
     }
 
-    container.appendChild(paginationTemplate.content.cloneNode(true));
-    const bottomPagesContainer = container.querySelector('#pages');
-    createPaginationButtons(bottomPagesContainer);
+    for (let page = currentPage; page <= currentPage + 4 && page <= totalPages; page++) {
+        createButton(page, pagesContainer, page === currentPage);
+    }
+
+    if (currentPage < totalPages) {
+        const separator = document.createElement('p');
+        separator.textContent = "...";
+        separator.style.margin = "0";
+        separator.style.marginLeft = "5px";
+        separator.style.marginRight = "5px";
+        pagesContainer.appendChild(separator);
+
+        createButton(totalPages, pagesContainer);
+    }
 
     const prevButtonBottom = container.querySelector('#prev-btn');
     const nextButtonBottom = container.querySelector('#next-btn');
@@ -189,33 +185,6 @@ async function insertPagination(container, totalItems, currentPage, itemsPerPage
             loadingFunction(currentPage + 1);
         }
     };
-
-    if (addToTop) {
-        const topPaginationContainer = document.createElement('div');
-        topPaginationContainer.innerHTML = paginationTemplateHTML;
-        container.prepend(topPaginationContainer);
-
-        const topPagesContainer = topPaginationContainer.querySelector('#pages');
-        createPaginationButtons(topPagesContainer);
-
-        const prevButtonTop = topPaginationContainer.querySelector('#prev-btn');
-        const nextButtonTop = topPaginationContainer.querySelector('#next-btn');
-
-        prevButtonTop.disabled = currentPage === 1;
-        nextButtonTop.disabled = currentPage === totalPages;
-
-        prevButtonTop.onclick = () => {
-            if (currentPage > 1) {
-                loadingFunction(currentPage - 1);
-            }
-        };
-
-        nextButtonTop.onclick = () => {
-            if (currentPage < totalPages) {
-                loadingFunction(currentPage + 1);
-            }
-        };
-    }
 }
 export { insertPagination };
 
