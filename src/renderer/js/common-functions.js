@@ -1,39 +1,34 @@
+import { populateSelects } from "../js/game-settigns-fetch.js";
+
 let config = {};
-let theme = '';
 let userLoader = '';
 let userVersion = '';
 
 async function loadConfig() {
     config = await window.api.getConfig()
-    theme = config.userSettings.theme;
     userLoader = config.userSettings.loader;
     userVersion = config.userSettings.version;
 }
 const loadConfigPromise = loadConfig();
 
 async function loadHeader() {
+    await loadConfig();
     try {
         const response = await fetch('../html/bones/header.html');
-        if (!response.ok) throw new Error('Network response was not ok');
         const headerHTML = await response.text();
         document.querySelector('header').innerHTML = headerHTML;
 
-        const loader = document.getElementById('loader');
-        const gameVersion = document.getElementById('game-version');
+        const loader = document.getElementById('loader-profile');
+        const gameVersion = document.getElementById('game-version-profile');
 
-        if (loader) loader.textContent = userLoader ?? "Loader not selected";
-        if (gameVersion) gameVersion.textContent = userVersion ?? "Version not selected";
+        if (loader) loader.textContent = (userLoader.charAt(0) + userLoader.slice(1)) || "Loader not selected";
+        if (gameVersion) gameVersion.textContent = userVersion || "Version not selected";
     } catch (error) {
         console.error('Failed to load header:', error);
     }
 
-
-    document.getElementById("profile").addEventListener("click", () => {
-        window.location.href = "user-profile.html";
-    });
-
     document.getElementById("manage-folders-btn").addEventListener("click", () => {
-        window.location.href = "index.html";
+        window.location.href = "manage-folders.html";
     });
 
     document.getElementById("mods-btn").addEventListener("click", () => {
@@ -47,7 +42,12 @@ async function loadHeader() {
     document.getElementById("shaders-btn").addEventListener("click", () => {
         window.location.href = "shaders.html";
     });
+
+    document.getElementById("profile").addEventListener("click", () => {
+        window.location.href = "user-profile.html";
+    });
 }
+export { loadHeader };
 
 async function loadTheme() {
     const theme = config.userSettings.theme;
@@ -72,10 +72,7 @@ async function downloadQuery(modId) {
         await showGameSettingsModal();
     }
 
-    if (!config.userSettings.downloadPath) {
-        await window.api.setDownloadPath();
-    }
-
+    // https://api.modrinth.com/v2/project/YL57xq9U/version MANAGE FOLDER OR AT LEAST STORE IT
     try {
         const fetchProjectUrl = 'https://api.modrinth.com/v2/project/' + modId;
         const fetchedProjectData = await fetch(fetchProjectUrl);
@@ -97,22 +94,68 @@ async function downloadQuery(modId) {
 
         let foundVersion = null;
 
+        // SEARCH FOR REALEASE VERSION?
         for (const version of versionsList) {
             if (version.game_versions.includes(userVersion) && version.loaders.includes(userLoader)) {
                 foundVersion = version;
                 break;
             }
         }
+        console.log('https://api.modrinth.com/v2/project/' + modId + '/version/' + foundVersion.id)
+        if (foundVersion == null) { console.error("Mod not Found"); return; }
 
-        const url = foundVersion.files[0].url;
-        const fileName = foundVersion.files[0].filename ?? path.basename(url);
-        await window.api.downloadFile(url, fileName);
+        await startDownload(foundVersion);
     } catch (error) {
         console.error('Error invoking downloadFile:', error);
         alert(`Download failed: ${error.message}`);
     }
 }
 export { downloadQuery };
+
+async function startDownload(version) {
+    if (!config.userSettings.downloadPath) {
+        await window.api.setDownloadPath();
+    }
+
+    const fileUrl = version.files[0].url;
+    const fileName = version.files[0].filename ?? path.basename(fileUrl);
+
+    window.api.downloadFile(fileUrl, fileName);
+
+    //DOWNLOAD DEPENDENCY
+    const depdendenciesList = version.dependencies;
+    for (const dependency of depdendenciesList) {
+        if (dependency.dependency_type == "required") {
+            const projectVersion = dependency.version_id;
+            const projectId = dependency.project_id;
+
+            let dependencyUrl = '';
+            if (projectVersion) {
+                dependencyUrl = 'https://api.modrinth.com/v2/project/' + projectId + '/version/' + projectVersion;
+            } else {
+                dependencyUrl = 'https://api.modrinth.com/v2/project/' + projectId + '/version';
+            }
+
+            const dependencyRawJson = await fetch(dependencyUrl);
+            let dependencyJson = await dependencyRawJson.json();
+
+            if (!projectVersion) {
+                for (const dependencyVersion of dependencyJson) {
+                    if (dependencyVersion.game_versions.includes(userVersion) && dependencyVersion.loaders.includes(userLoader)) {
+                        dependencyJson = dependencyVersion;
+                        break;
+                    }
+                }
+            }
+
+            const dependencyFileUrl = dependencyJson.files[0].url;
+            const depdendencfileName = dependencyJson.files[0].filename ?? path.basename(dependencyFileUrl);
+
+            window.api.downloadFile(dependencyFileUrl, depdendencfileName);
+        }
+    }
+}
+export { startDownload };
 
 async function insertPagination(container, totalItems, currentPage, itemsPerPage, loadingFunction) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -229,67 +272,6 @@ async function showGameSettingsModal() {
     loadHeader();
     await window.api.setUserSettings(config);
 }
-
-let loaders = [];
-let gameVersions = [];
-
-async function loadLoaders() {
-    try {
-
-    } catch (error) {
-        console.error("Failed to fetching game-settings-tags:", error);
-    }
-    const response = await fetch("https://api.modrinth.com/v2/tag/loader");
-    const data = await response.json();
-
-    const filter = ["mod", "project", "modpack"];
-
-    data.forEach(element => {
-        if (filter.every(type => element.supported_project_types.includes(type))) {
-            loaders.push(element.name);
-        }
-    });
-}
-const loadersLoading = loadLoaders();
-
-async function loadGameVersions() {
-    try {
-
-    } catch (error) {
-        console.error("Failed to fetching game-settings-tags:", error);
-    }
-    const response = await fetch("https://api.modrinth.com/v2/tag/game_version");
-    const data = await response.json();
-
-    data.forEach(element => {
-        if (element.version_type == "release") {
-            gameVersions.push(element.version);
-        }
-    });
-}
-const gameVersionsLoading = loadGameVersions();
-
-async function populateSelects() {
-    await loadersLoading;
-    await gameVersionsLoading;
-
-    const loaderSelect = document.getElementById("loader-select");
-    const gameVersionSelect = document.getElementById("game-version-select");
-
-    loaders.forEach(loader => {
-        const option = document.createElement('option');
-        option.value = loader;
-        option.textContent = loader.charAt(0).toUpperCase() + loader.slice(1);
-        loaderSelect.appendChild(option);
-    });
-
-    gameVersions.forEach(version => {
-        const option = document.createElement('option');
-        option.value = version;
-        option.textContent = version;
-        gameVersionSelect.appendChild(option);
-    });
-};
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadConfigPromise;

@@ -1,5 +1,6 @@
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import { downloadQuery } from './common-functions.js';
+import { startDownload } from './common-functions.js';
 
 let loadedData = [];
 let list = '';
@@ -142,18 +143,13 @@ async function loadInfoIntoPage() {
             // Configure the download button
             const downloadButton = modVersionItem.querySelector('.download-button');
             downloadButton.addEventListener("click", async () => {
-                downloadSelectedMod(version);
+                startDownload(version);
+                // https://api.modrinth.com/v2/project/YL57xq9U/version MANAGE FOLDER OR AT LEAST STORE IT
             });
 
             modVersionList.appendChild(modVersionItem);
         }
     });
-}
-
-async function downloadSelectedMod(version) {
-    const url = version.files[0].url;
-    const fileName = version.files[0].filename ?? path.basename(url);
-    await window.api.downloadFile(url, fileName);
 }
 
 // Tab's functionality

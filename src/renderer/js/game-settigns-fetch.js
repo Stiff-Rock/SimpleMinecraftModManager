@@ -58,14 +58,5 @@ async function populateSelects() {
         gameVersionSelect.appendChild(option);
     });
 };
+
 export { populateSelects };
-
-let populateSelectPomise
-export { populateSelectPomise };
-
-document.addEventListener("DOMContentLoaded", () => {
-    populateSelectPomise = populateSelects();
-});
-
-
-

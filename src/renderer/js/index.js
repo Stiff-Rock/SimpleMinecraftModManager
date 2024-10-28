@@ -1,8 +1,12 @@
-import { downloadQuery, insertPagination } from './common-functions.js';
+import { downloadQuery, insertPagination, loadHeader } from './common-functions.js';
+import { populateSelects } from "../js/game-settigns-fetch.js";
 
 let currentPage = 1;
+const itemsPerPage = 20;
 let query = '';
-let categories = [];
+let versionFacet = '';
+let loaderFacet = '';
+let facets = [];
 
 let totalItems = 0;
 let mods = [];
@@ -22,19 +26,88 @@ async function fetchCategories() {
 }
 const fetchCategoriesPromise = fetchCategories();
 
-const itemsPerPage = 20;
+let categories = [];
+async function loadCategoriesPage() {
+    const filtersContainer = document.getElementById("categories-container");
+    categories.forEach(tag => {
+        const tagContainer = document.createElement('div');
+        tagContainer.classList.add('tag-container');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = tag.charAt(0).toUpperCase() + tag.slice(1);
+        checkbox.value = tag;
+        checkbox.classList.add("checkbox");
+        checkbox.addEventListener('change', (event) => {
+            if (event.target.checked) {
+                if (facets.length === 0) {
+                    facets.push(",[%22categories:" + tag + "%22]");
+                } else {
+                    facets.push("[%22categories:" + tag + "%22]");
+                }
+                fetchMods(0);
+            } else {
+                facets = facets.filter(facet => !facet.includes(tag));
+                fetchMods(0);
+            }
+        });
+        tagContainer.append(checkbox);
+
+        const label = document.createElement('label');
+        label.textContent = tag;
+        label.classList.add("tag");
+        tagContainer.append(label);
+
+        filtersContainer.appendChild(tagContainer);
+    });
+}
+
+async function setupGameSettingsSelects() {
+    const loaderSelect = document.getElementById("loader-select");
+    const gameVersionSelect = document.getElementById("game-version-select");
+
+    let config = await window.api.getConfig();
+
+    gameVersionSelect.value = config.userSettings.version || '';
+    loaderSelect.value = config.userSettings.loader || '';
+
+    gameVersionSelect.addEventListener('change', (event) => {
+        config.userSettings.version = event.target.value;
+        window.api.setUserSettings(config);
+        if (event.target.value) {
+            versionFacet = ",[%22versions:" + event.target.value + "%22]"
+        } else {
+            versionFacet = '';
+        }
+        fetchMods(0);
+        loadHeader();
+    });
+
+    loaderSelect.addEventListener('change', (event) => {
+        config.userSettings.loader = event.target.value;
+        window.api.setUserSettings(config);
+        if (event.target.value) {
+            loaderFacet = ",[%22categories:" + event.target.value + "%22]"
+        } else {
+            loaderFacet = '';
+        }
+        fetchMods(0);
+        loadHeader();
+    });
+}
+
 async function fetchMods(page = 1) {
     try {
-        if (!page == 0) currentPage = page;
+        if (page != 0) currentPage = page;
 
         const offsetAmount = (currentPage - 1) * itemsPerPage;
-
         const url = "https://api.modrinth.com/v2"
             + "/search?query=" + query
-            + "&facets=[" + "[%22project_type:mod%22]" + "]"
+            + "&facets=[" + "[%22project_type:mod%22]" + versionFacet + loaderFacet + facets + "]"
             + "&limit=" + itemsPerPage
             + "&offset=" + offsetAmount
             + "&index=downloads";
+        console.log(url);
 
         const response = await fetch(url);
         const data = await response.json();
@@ -43,43 +116,14 @@ async function fetchMods(page = 1) {
     } catch (error) {
         console.error('Error fetching mods:', error);
     }
+    await waitForDOMReady;
+    loadModsPage();
 }
-const fetchModsPromise = fetchMods();
+fetchMods();
 
-
-async function loadCategories() {
-    const filtersContainer = document.getElementById("filters-aside");
-    categories.forEach(tag => {
-        const tagContainer = document.createElement('div');
-        tagContainer.classList.add('tag-container');
-
-        const label = document.createElement('label');
-        label.textContent = tag;
-        label.classList.add("tag");
-        tagContainer.append(label);
-
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.name = tag.charAt(0).toUpperCase() + tag.slice(1);
-        checkbox.value = tag;
-        checkbox.classList.add("checkbox");
-        tagContainer.append(checkbox);
-
-        filtersContainer.appendChild(tagContainer);
-    });
-    
-}
-
-async function loadMods() {
+async function loadModsPage() {
     const modList = document.getElementById('mod-list');
     modList.innerHTML = '';
-
-    if (mods.length === 0) {
-        const noModsMessage = document.createElement('p');
-        noModsMessage.textContent = 'No mods found.';
-        modList.appendChild(noModsMessage);
-        return;
-    }
 
     const queryContainer = document.createElement('div');
     queryContainer.style.display = "flex";
@@ -113,6 +157,13 @@ async function loadMods() {
     queryContainer.appendChild(submitButton);
 
     modList.appendChild(queryContainer);
+
+    if (mods.length === 0) {
+        const noModsMessage = document.createElement('p');
+        noModsMessage.textContent = 'No mods found.';
+        modList.appendChild(noModsMessage);
+        return;
+    }
 
     mods.forEach(mod => {
         const modItem = document.createElement('div');
@@ -164,9 +215,21 @@ async function loadMods() {
     await insertPagination(modList, totalItems, currentPage, itemsPerPage, fetchMods, true);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await Promise.all([fetchCategoriesPromise, fetchModsPromise]);
+const waitForDOMReady = () => {
+    return new Promise((resolve) => {
+        if (document.readyState === "interactive" || document.readyState === "complete") {
+            resolve();
+        } else {
+            document.addEventListener('DOMContentLoaded', () => resolve());
+        }
+    });
+};
 
-    loadCategories();
-    loadMods();
-})
+(async function () {
+    await waitForDOMReady();
+    await fetchCategoriesPromise;
+    loadCategoriesPage();
+    fetchMods();
+    await populateSelects();
+    setupGameSettingsSelects()
+})();

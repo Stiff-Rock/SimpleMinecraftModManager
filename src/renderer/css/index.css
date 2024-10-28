@@ -25,28 +25,50 @@ input:focus {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
+
 #filters-aside {
-    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
     margin-right: 40px;
     width: 30%;
+    gap: 10px;
+}
+
+#categories-container,
+#game-settings-container {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    margin-right: 40px;
+    width: 100%;
     border-radius: 5px;
+    padding: 10px;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+#categories-container h3 {
+    margin: 0;
 }
 
 .tag-container {
     display: flex;
     align-items: center;
-}
-
-.tag {
     width: 100%;
-    color: var(--text-color);
+    border-radius: 5px;
 }
 
 .checkbox {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px; 
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
 }
+
+.tag {
+    width: max-content;
+    color: var(--text-color);
+}
+
 
 #mod-list {
     display: flex;

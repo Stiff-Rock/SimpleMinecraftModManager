@@ -13,9 +13,26 @@
 
 <body>
   <header></header>
-
   <main>
-    <aside id="filters-aside"></aside>
+    <aside id="filters-aside">
+      <section id="game-settings-container">
+        <section id="versions-container">
+          <h4>Versions</h4>
+          <select id="game-version-select" name="game-version" required>
+            <option value="">Select version</option>
+          </select>
+        </section>
+        <section id="loaders-container">
+          <h4>Loaders</h4>
+          <select id="loader-select" name="loader" required>
+            <option value="">Select loader</option>
+          </select>
+        </section>
+      </section>
+      <section id="categories-container">
+        <h3>Categories</h3>
+      </section>
+    </aside>
     <div id="mod-list"></div>
   </main>
 

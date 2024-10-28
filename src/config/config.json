@@ -1,9 +1,11 @@
 {
+  "modFolder": {},
   "userSettings": {
     "downloadPath": "C:\\Users\\Yago\\Downloads",
     "theme": "dark",
     "loader": "fabric",
-    "version": "1.20.6",
-    "autoDownloadDependencies": true
+    "version": "1.21",
+    "autoDownloadDependencies": true,
+    "preferRelease": true
   }
 }
