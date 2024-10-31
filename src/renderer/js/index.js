@@ -1,5 +1,6 @@
 import { downloadQuery, insertPagination, loadHeader } from './common-functions.js';
 import { populateSelects } from "../js/game-settigns-fetch.js";
+import * as config from './config.js';
 
 let currentPage = 1;
 const itemsPerPage = 20;
@@ -66,14 +67,11 @@ async function setupGameSettingsSelects() {
     const loaderSelect = document.getElementById("loader-select");
     const gameVersionSelect = document.getElementById("game-version-select");
 
-    let config = await window.api.getConfig();
-
-    gameVersionSelect.value = config.userSettings.version || '';
-    loaderSelect.value = config.userSettings.loader || '';
+    gameVersionSelect.value = config.getVersion() || '';
+    loaderSelect.value = config.getLoader() || '';
 
     gameVersionSelect.addEventListener('change', (event) => {
-        config.userSettings.version = event.target.value;
-        window.api.setUserSettings(config);
+        config.setVersion(event.target.value);
         if (event.target.value) {
             versionFacet = ",[%22versions:" + event.target.value + "%22]"
         } else {
@@ -84,8 +82,7 @@ async function setupGameSettingsSelects() {
     });
 
     loaderSelect.addEventListener('change', (event) => {
-        config.userSettings.loader = event.target.value;
-        window.api.setUserSettings(config);
+        config.setLoader(event.target.value);
         if (event.target.value) {
             loaderFacet = ",[%22categories:" + event.target.value + "%22]"
         } else {

@@ -1,12 +1,12 @@
+const { loadConfigFile } = require('./config.js');
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const os = require('os');
 
-let configPath = '';
 let config = {};
-let theme = '';
+const configPath = path.join(__dirname, '..', 'config', 'config.json');
 let userDownloadDirectory = null;
 
 const createWindow = () => {
@@ -23,11 +23,15 @@ const createWindow = () => {
 
 function loadConfig() {
   try {
-    configPath = path.join(__dirname, '..', 'config', 'config.json');
     const rawData = fs.readFileSync(configPath, 'utf8');
     config = JSON.parse(rawData);
+
     userDownloadDirectory = config.userSettings.downloadPath;
-    theme = config.userSettings.theme;
+    if (!config.userSettings.theme) {
+      config.userSettings.theme = "sys";
+    }
+
+    loadConfigFile();
   } catch (error) {
     console.error('Error loading config:', error);
     dialog.showMessageBox({
@@ -38,10 +42,6 @@ function loadConfig() {
   }
 }
 loadConfig()
-
-ipcMain.handle('get-config', async () => {
-  return config;
-});
 
 ipcMain.handle('dialog:openDirectory', async () => {
   const selectedPath = await selectDirectory();
@@ -65,10 +65,6 @@ async function selectDirectory() {
   }
   return null;
 }
-
-ipcMain.handle('setUserSettings', async (event, newConfig) => {
-  setUserSettings(newConfig)
-});
 
 function setUserSettings(newConfig) {
   try {

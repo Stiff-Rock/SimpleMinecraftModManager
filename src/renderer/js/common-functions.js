@@ -1,18 +1,10 @@
 import { populateSelects } from "../js/game-settigns-fetch.js";
+import * as config from './config.js';
 
-let config = {};
 let userLoader = '';
 let userVersion = '';
 
-async function loadConfig() {
-    config = await window.api.getConfig()
-    userLoader = config.userSettings.loader;
-    userVersion = config.userSettings.version;
-}
-const loadConfigPromise = loadConfig();
-
 async function loadHeader() {
-    await loadConfig();
     try {
         const response = await fetch('../html/bones/header.html');
         const headerHTML = await response.text();
@@ -21,6 +13,8 @@ async function loadHeader() {
         const loader = document.getElementById('loader-profile');
         const gameVersion = document.getElementById('game-version-profile');
 
+        userLoader = config.getLoader();
+        userVersion = config.getVersion();
         if (loader) loader.textContent = (userLoader.charAt(0) + userLoader.slice(1)) || "Loader not selected";
         if (gameVersion) gameVersion.textContent = userVersion || "Version not selected";
     } catch (error) {
@@ -50,7 +44,7 @@ async function loadHeader() {
 export { loadHeader };
 
 async function loadTheme() {
-    const theme = config.userSettings.theme;
+    const theme = config.getTheme();
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     if (theme === 'sys') {
@@ -68,7 +62,7 @@ async function loadTheme() {
 export { loadTheme };
 
 async function downloadQuery(modId) {
-    if (!config.userSettings.loader || !config.userSettings.version) {
+    if (!config.getLoader() || !config.getVersion()) {
         await showGameSettingsModal();
     }
 
@@ -113,7 +107,7 @@ async function downloadQuery(modId) {
 export { downloadQuery };
 
 async function startDownload(version) {
-    if (!config.userSettings.downloadPath) {
+    if (!config.getDownloadPath()) {
         await window.api.setDownloadPath();
     }
 
@@ -250,11 +244,11 @@ async function showGameSettingsModal() {
             const loaderSelect = document.getElementById('loader-select');
             const gameVersionSelect = document.getElementById('game-version-select');
 
-            config.userSettings.loader = loaderSelect.value;
-            config.userSettings.version = gameVersionSelect.value;
+            config.setLoader(loaderSelect.value);
+            config.setVersion(gameVersionSelect.value);
 
-            userLoader = config.userSettings.loader;
-            userVersion = config.userSettings.version;
+            userLoader = config.getLoader();
+            userVersion = config.getVersion();
 
             resolve();
 
