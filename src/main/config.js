@@ -1,9 +1,69 @@
+const { ipcMain } = require('electron');
+
 let config = {};
 
 // Function to load the initial configuration from a provided object
 function loadConfigFile(fetchedConfig) {
   config = fetchedConfig;
 }
+module.exports = { loadConfigFile };
+
+// IPC Handlers
+ipcMain.handle('get-mod-folder', () => {
+  return getModFolder();
+});
+
+ipcMain.handle('get-download-path', () => {
+  return getDownloadPath();
+});
+
+ipcMain.handle('get-theme', () => {
+  return getTheme();
+});
+
+ipcMain.handle('get-loader', () => {
+  return getLoader();
+});
+
+ipcMain.handle('get-version', () => {
+  return getVersion();
+});
+
+ipcMain.handle('get-auto-download-dependencies', () => {
+  return getAutoDownloadDependencies();
+});
+
+ipcMain.handle('get-prefer-release', () => {
+  return getPreferRelease();
+});
+
+ipcMain.handle('set-mod-folder', (event, folder) => {
+  setModFolder(folder);
+});
+
+ipcMain.handle('set-download-path', (event, path) => {
+  setDownloadPath(path);
+});
+
+ipcMain.handle('set-theme', (event, theme) => {
+  setTheme(theme);
+});
+
+ipcMain.handle('set-loader', (event, loader) => {
+  setLoader(loader);
+});
+
+ipcMain.handle('set-version', (event, version) => {
+  setVersion(version);
+});
+
+ipcMain.handle('set-auto-download-dependencies', (event, value) => {
+  setAutoDownloadDependencies(value);
+});
+
+ipcMain.handle('set-prefer-release', (event, value) => {
+  setPreferRelease(value);
+});
 
 // Getters
 function getModFolder() {
@@ -44,7 +104,11 @@ function setDownloadPath(path) {
   config.userSettings.downloadPath = path;
   updateConfigFile();
 }
-
+module.exports = {
+  loadConfigFile,
+  // If you need to export config as well, you can uncomment the line below
+  // config,
+}
 function setTheme(theme) {
   config.userSettings.theme = theme;
   updateConfigFile();
