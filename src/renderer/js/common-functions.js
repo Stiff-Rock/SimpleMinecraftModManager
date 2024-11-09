@@ -1,8 +1,17 @@
 import { populateSelects } from "../js/game-settigns-fetch.js";
-import * as config from './config.js';
 
+let config = {}
+let theme = '';
 let userLoader = '';
 let userVersion = '';
+
+async function loadConfig() {
+    config = await window.api.getConfig()
+    theme = config.userSettings.theme;
+    userLoader = config.userSettings.loader;
+    userVersion = config.userSettings.version;
+}
+const loadConfigPromise = loadConfig();
 
 async function loadHeader() {
     try {
@@ -13,8 +22,8 @@ async function loadHeader() {
         const loader = document.getElementById('loader-profile');
         const gameVersion = document.getElementById('game-version-profile');
 
-        userLoader = config.getLoader();
-        userVersion = config.getVersion();
+        userLoader = await window.api.getLoader();
+        userVersion = await window.api.getVersion();
         if (loader) loader.textContent = (userLoader.charAt(0) + userLoader.slice(1)) || "Loader not selected";
         if (gameVersion) gameVersion.textContent = userVersion || "Version not selected";
     } catch (error) {
@@ -44,7 +53,7 @@ async function loadHeader() {
 export { loadHeader };
 
 async function loadTheme() {
-    const theme = config.getTheme();
+    const theme = await window.api.getTheme();
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     if (theme === 'sys') {
@@ -62,7 +71,7 @@ async function loadTheme() {
 export { loadTheme };
 
 async function downloadQuery(modId) {
-    if (!config.getLoader() || !config.getVersion()) {
+    if (!await window.api.getLoader() || !await window.api.getVersion()) {
         await showGameSettingsModal();
     }
 
@@ -73,12 +82,12 @@ async function downloadQuery(modId) {
         const projectData = await fetchedProjectData.json();
 
         if (!projectData.loaders.includes(userLoader)) {
-            window.api.showErrorDialog("Requested loader not available for this mod");
+            await window.api.showErrorDialog("Requested loader not available for this mod");
             return;
         }
 
         if (!projectData.game_versions.includes(userVersion)) {
-            window.api.showErrorDialog("Requested version not available for this mod");
+            await window.api.showErrorDialog("Requested version not available for this mod");
             return;
         }
 
@@ -107,14 +116,14 @@ async function downloadQuery(modId) {
 export { downloadQuery };
 
 async function startDownload(version) {
-    if (!config.getDownloadPath()) {
-        await window.api.setDownloadPath();
+    if (!await window.api.getDownloadPath()) {
+        await await window.api.setDownloadPath();
     }
 
     const fileUrl = version.files[0].url;
     const fileName = version.files[0].filename ?? path.basename(fileUrl);
 
-    window.api.downloadFile(fileUrl, fileName);
+    await window.api.downloadFile(fileUrl, fileName);
 
     //DOWNLOAD DEPENDENCY
     const depdendenciesList = version.dependencies;
@@ -145,7 +154,7 @@ async function startDownload(version) {
             const dependencyFileUrl = dependencyJson.files[0].url;
             const depdendencfileName = dependencyJson.files[0].filename ?? path.basename(dependencyFileUrl);
 
-            window.api.downloadFile(dependencyFileUrl, depdendencfileName);
+            await window.api.downloadFile(dependencyFileUrl, depdendencfileName);
         }
     }
 }
@@ -240,15 +249,15 @@ async function showGameSettingsModal() {
     await new Promise((resolve, reject) => {
         const confirmButton = modal.querySelector('button');
 
-        confirmButton.addEventListener('click', () => {
+        confirmButton.addEventListener('click', async () => {
             const loaderSelect = document.getElementById('loader-select');
             const gameVersionSelect = document.getElementById('game-version-select');
 
-            config.setLoader(loaderSelect.value);
-            config.setVersion(gameVersionSelect.value);
+            await window.api.setLoader(loaderSelect.value);
+            await window.api.setVersion(gameVersionSelect.value);
 
-            userLoader = config.getLoader();
-            userVersion = config.getVersion();
+            userLoader = await window.api.getLoader();
+            userVersion = await window.api.getVersion();
 
             resolve();
 
@@ -264,7 +273,7 @@ async function showGameSettingsModal() {
     });
 
     loadHeader();
-    await window.api.setUserSettings(config);
+    await await window.api.setUserSettings(config);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

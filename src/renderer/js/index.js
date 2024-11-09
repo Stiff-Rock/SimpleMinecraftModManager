@@ -1,6 +1,5 @@
 import { downloadQuery, insertPagination, loadHeader } from './common-functions.js';
 import { populateSelects } from "../js/game-settigns-fetch.js";
-import * as config from './config.js';
 
 let currentPage = 1;
 const itemsPerPage = 20;
@@ -67,11 +66,11 @@ async function setupGameSettingsSelects() {
     const loaderSelect = document.getElementById("loader-select");
     const gameVersionSelect = document.getElementById("game-version-select");
 
-    gameVersionSelect.value = config.getVersion() || '';
-    loaderSelect.value = config.getLoader() || '';
+    gameVersionSelect.value = await window.api.getVersion() || '';
+    loaderSelect.value = await window.api.getLoader() || '';
 
     gameVersionSelect.addEventListener('change', (event) => {
-        config.setVersion(event.target.value);
+        window.api.setVersion(event.target.value);
         if (event.target.value) {
             versionFacet = ",[%22versions:" + event.target.value + "%22]"
         } else {
@@ -82,7 +81,7 @@ async function setupGameSettingsSelects() {
     });
 
     loaderSelect.addEventListener('change', (event) => {
-        config.setLoader(event.target.value);
+        window.api.setLoader(event.target.value);
         if (event.target.value) {
             loaderFacet = ",[%22categories:" + event.target.value + "%22]"
         } else {
@@ -104,7 +103,6 @@ async function fetchMods(page = 1) {
             + "&limit=" + itemsPerPage
             + "&offset=" + offsetAmount
             + "&index=downloads";
-        console.log(url);
 
         const response = await fetch(url);
         const data = await response.json();
@@ -113,7 +111,7 @@ async function fetchMods(page = 1) {
     } catch (error) {
         console.error('Error fetching mods:', error);
     }
-    await waitForDOMReady;
+    waitForDOMReady;
     loadModsPage();
 }
 fetchMods();
@@ -146,7 +144,7 @@ async function loadModsPage() {
     const submitButton = document.createElement('button');
     submitButton.id = 'submitButton';
     submitButton.textContent = 'Submit';
-    submitButton.addEventListener('click', (event) => {
+    submitButton.addEventListener('click', (_) => {
         query = input.value;
         fetchMods(0);
     });

@@ -1,4 +1,3 @@
-const { loadConfigFile } = require('./config.js');
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -31,7 +30,6 @@ function loadConfig() {
       config.userSettings.theme = "sys";
     }
 
-    loadConfigFile();
   } catch (error) {
     console.error('Error loading config:', error);
     dialog.showMessageBox({
@@ -42,14 +40,6 @@ function loadConfig() {
   }
 }
 loadConfig()
-
-ipcMain.handle('dialog:openDirectory', async () => {
-  const selectedPath = await selectDirectory();
-  if (!selectedPath) {
-    return { status: 'error', msg: 'Download directory not selected.' };
-  }
-  return { status: 'success', path: selectedPath };
-});
 
 async function selectDirectory() {
   const result = await dialog.showOpenDialog({
@@ -75,7 +65,20 @@ function setUserSettings(newConfig) {
   }
 }
 
-ipcMain.handle('download-file', async (event, url, fileName) => {
+function showErrorDialog(message) {
+  dialog.showMessageBox({
+    type: 'error',
+    title: 'Error',
+    message: message,
+    buttons: ['OK']
+  });
+}
+
+ipcMain.handle('get-config', async () => {
+  return config;
+});
+
+ipcMain.handle('download-file', async (_, url, fileName) => {
   if (!userDownloadDirectory) {
     await selectDirectory();
     if (!userDownloadDirectory) {
@@ -129,17 +132,117 @@ ipcMain.handle('download-file', async (event, url, fileName) => {
   });
 });
 
-ipcMain.handle('showErrorDialog', async (event, message) => {
+ipcMain.handle('dialog:openDirectory', async () => {
+  const selectedPath = await selectDirectory();
+  if (!selectedPath) {
+    return { status: 'error', msg: 'Download directory not selected.' };
+  }
+  return { status: 'success', path: selectedPath };
+});
+
+ipcMain.handle('showErrorDialog', async (_, message) => {
   showErrorDialog(message)
 });
 
-function showErrorDialog(message) {
-  dialog.showMessageBox({
-    type: 'error',
-    title: 'Error',
-    message: message,
-    buttons: ['OK']
-  });
+// Setters
+function setModFolder(folder) {
+  config.modFolder = folder;
+  updateConfigFile();
+}
+
+function setDownloadPath(path) {
+  config.userSettings.downloadPath = path;
+  updateConfigFile();
+}
+
+function setTheme(theme) {
+  config.userSettings.theme = theme;
+  updateConfigFile();
+}
+
+function setLoader(loader) {
+  config.userSettings.loader = loader;
+  updateConfigFile();
+}
+
+function setVersion(version) {
+  config.userSettings.version = version;
+  updateConfigFile();
+}
+
+function setAutoDownloadDependencies(value) {
+  config.userSettings.autoDownloadDependencies = value;
+  updateConfigFile();
+}
+
+function setPreferRelease(value) {
+  config.userSettings.preferRelease = value;
+  updateConfigFile();
+}
+
+// IPC Handlers with direct value return
+ipcMain.handle('get-mod-folder', () => {
+  return config.modFolder;
+});
+
+ipcMain.handle('get-download-path', () => {
+  return config.userSettings.downloadPath;
+});
+
+ipcMain.handle('get-theme', () => {
+  return config.userSettings.theme;
+});
+
+ipcMain.handle('get-loader', () => {
+  return config.userSettings.loader;
+});
+
+ipcMain.handle('get-version', () => {
+  return config.userSettings.version;
+});
+
+ipcMain.handle('get-auto-download-dependencies', () => {
+  return config.userSettings.autoDownloadDependencies;
+});
+
+ipcMain.handle('get-prefer-release', () => {
+  return config.userSettings.preferRelease;
+});
+
+ipcMain.handle('set-mod-folder', (_, folder) => {
+  setModFolder(folder);
+});
+
+ipcMain.handle('set-download-path', (_, path) => {
+  setDownloadPath(path);
+});
+
+ipcMain.handle('set-theme', (_, theme) => {
+  setTheme(theme);
+});
+
+ipcMain.handle('set-loader', (_, loader) => {
+  setLoader(loader);
+});
+
+ipcMain.handle('set-version', (_, version) => {
+  setVersion(version);
+});
+
+ipcMain.handle('set-auto-download-dependencies', (_, value) => {
+  setAutoDownloadDependencies(value);
+});
+
+ipcMain.handle('set-prefer-release', (_, value) => {
+  setPreferRelease(value);
+});
+
+function updateConfigFile() {
+  try {
+    fs.writeFileSync(path.join(__dirname, '..', 'config', 'config.json'), JSON.stringify(config, null, 2));
+  } catch (error) {
+    console.error('Error writing config file:', error);
+  }
 }
 
 app.whenReady().then(() => {

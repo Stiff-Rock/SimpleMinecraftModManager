@@ -1,7 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  // Configuration-related methods
+  // config getters
   getModFolder: () => ipcRenderer.invoke('get-mod-folder'),
   getDownloadPath: () => ipcRenderer.invoke('get-download-path'),
   getTheme: () => ipcRenderer.invoke('get-theme'),
@@ -9,9 +9,8 @@ contextBridge.exposeInMainWorld('api', {
   getVersion: () => ipcRenderer.invoke('get-version'),
   getAutoDownloadDependencies: () => ipcRenderer.invoke('get-auto-download-dependencies'),
   getPreferRelease: () => ipcRenderer.invoke('get-prefer-release'),
-  
+  // config setters
   setModFolder: (folder) => ipcRenderer.invoke('set-mod-folder', folder),
-  setDownloadPath: () => ipcRenderer.invoke('dialog:openDirectory'),
   setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
   setLoader: (loader) => ipcRenderer.invoke('set-loader', loader),
   setVersion: (version) => ipcRenderer.invoke('set-version', version),
@@ -19,6 +18,8 @@ contextBridge.exposeInMainWorld('api', {
   setPreferRelease: (value) => ipcRenderer.invoke('set-prefer-release', value),
 
   // Other existing methods
+  getConfig: () => ipcRenderer.invoke('get-config'),
+  setDownloadPath: () => ipcRenderer.invoke('dialog:openDirectory'),
   downloadFile: (url, fileName) => ipcRenderer.invoke('download-file', url, fileName),
   showErrorDialog: (message) => ipcRenderer.invoke('showErrorDialog', message)
 });
