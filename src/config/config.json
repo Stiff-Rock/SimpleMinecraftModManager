@@ -1,7 +1,7 @@
 {
   "modFolder": {},
   "userSettings": {
-    "downloadPath": "C:\\Users\\Yago\\Downloads",
+    "downloadPath": "/home/yago/Downloads",
     "theme": "dark",
     "loader": "fabric",
     "version": "1.21",

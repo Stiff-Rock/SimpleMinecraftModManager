@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const os = require('os');
+const { log } = require('console');
 
 let config = {};
 const configPath = path.join(__dirname, '..', 'config', 'config.json');
@@ -73,6 +74,34 @@ function showErrorDialog(message) {
     buttons: ['OK']
   });
 }
+
+function loadModFolderList() {
+  return new Promise((resolve, reject) => {
+    const dir = config.userSettings.downloadPath;
+
+    fs.readdir(dir, (err, files) => {
+      if (err) {
+        window.api.showErrorDialog("Error reading mod folder");
+        reject(err); // Reject the promise with the error
+        return;
+      }
+
+      // Filter the files that end with '.jar'
+      const jarFiles = files.filter(archivo => archivo.endsWith('.jar'));
+      resolve(jarFiles); // Resolve the promise with the filtered list
+    });
+  });
+}
+
+// Handling the request from the renderer process using IPC
+ipcMain.handle('load-mod-folder-list', async () => {
+  try {
+    return await loadModFolderList(); // Await the result of the Promise
+  } catch (err) {
+    console.error('Error loading mod folder list:', err);
+    return []; // Return an empty array in case of error
+  }
+});
 
 ipcMain.handle('get-config', async () => {
   return config;
