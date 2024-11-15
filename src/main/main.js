@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const os = require('os');
-const { log } = require('console');
+const JSZip = require('jszip');
 
 let config = {};
 const configPath = path.join(__dirname, '..', 'config', 'config.json');
@@ -13,6 +13,7 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 1024,
     height: 768,
+    icon: path.join(__dirname, '../images/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     }
@@ -76,30 +77,53 @@ function showErrorDialog(message) {
 }
 
 function loadModFolderList() {
+  const dir = config.userSettings.downloadPath;
+
   return new Promise((resolve, reject) => {
-    const dir = config.userSettings.downloadPath;
+    fs.readdir(dir, async (err, files) => {
+      if (err) return reject(err);
 
-    fs.readdir(dir, (err, files) => {
-      if (err) {
-        window.api.showErrorDialog("Error reading mod folder");
-        reject(err); // Reject the promise with the error
-        return;
+      const jarFiles = files.filter(file => file.endsWith('.jar'));
+      let modNamesList = [jarFiles.length];
+
+      for (const jarFile of jarFiles) {
+        try {
+          const zip = await JSZip.loadAsync(fs.readFileSync(path.join(dir, jarFile)));
+          const file = zip.file('fabric.mod.json') || zip.file('META-INF/mods.toml');
+
+          if (file) {
+            const content = await file.async('text');
+            let modName = '';
+
+            if (file.name.endsWith('.json') && content.includes('"name":')) {
+              modName = content.match(/"name":\s*"([^"]+)"/)?.[1];
+            }
+
+            if (file.name.endsWith('.toml') && content.includes('displayName=')) {
+              modName = content.match(/displayName=\s*"([^"]+)"/)?.[1];
+            }
+
+            if (!modName) modName = jarFile;
+
+            modNamesList.push(modNamesList.length + ' - ' + modName);
+
+          } else {
+            console.log(`No mod metadata of anykind found at ${jarFile}`);
+          }
+        } catch (error) {
+          console.error('Error reading JAR file:', error);
+        }
       }
-
-      // Filter the files that end with '.jar'
-      const jarFiles = files.filter(archivo => archivo.endsWith('.jar'));
-      resolve(jarFiles); // Resolve the promise with the filtered list
+      resolve(modNamesList);
     });
   });
 }
-
-// Handling the request from the renderer process using IPC
 ipcMain.handle('load-mod-folder-list', async () => {
   try {
-    return await loadModFolderList(); // Await the result of the Promise
+    return await loadModFolderList();
   } catch (err) {
     console.error('Error loading mod folder list:', err);
-    return []; // Return an empty array in case of error
+    return [];
   }
 });
 

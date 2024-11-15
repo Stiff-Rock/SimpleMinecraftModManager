@@ -1,13 +1,23 @@
 async function getModList() {
-  const mods = await window.api.loadModFolderList();
-  console.log('Mods cargados: ' + mods);
-  mods.forEach(element => {
-    const text = document.createElement('p');
-    text.innerText = element;
+  let mods = await window.api.loadModFolderList();
 
-    const mainContent = document.getElementById('mainContent')
-    mainContent.appendChild(text);
-  });
+
+  if (!mods.length > 0) {
+    addModCard('No mods found in folder');
+  } else {
+    mods.forEach(element => {
+      addModCard(element);
+    });
+  }
+
+}
+
+function addModCard(element) {
+  const text = document.createElement('p');
+  text.innerText = element;
+
+  const mainContent = document.getElementById('mainContent')
+  mainContent.appendChild(text);
 }
 
 const waitForDOMReady = () => {
