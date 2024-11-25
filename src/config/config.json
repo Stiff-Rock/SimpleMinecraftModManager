@@ -3,7 +3,7 @@
   "userSettings": {
     "downloadPath": "/home/yago/Downloads",
     "theme": "dark",
-    "loader": "fabric",
+    "loader": "forge",
     "version": "1.21",
     "autoDownloadDependencies": true,
     "preferRelease": true

@@ -4,6 +4,7 @@ const fs = require('fs');
 const https = require('https');
 const os = require('os');
 const JSZip = require('jszip');
+const toml = require('toml');
 
 let config = {};
 const configPath = path.join(__dirname, '..', 'config', 'config.json');
@@ -84,40 +85,48 @@ function loadModFolderList() {
       if (err) return reject(err);
 
       const jarFiles = files.filter(file => file.endsWith('.jar'));
-      let modNamesList = [jarFiles.length];
+      let modsList = [jarFiles.length];
 
       for (const jarFile of jarFiles) {
         try {
+
           const zip = await JSZip.loadAsync(fs.readFileSync(path.join(dir, jarFile)));
           const file = zip.file('fabric.mod.json') || zip.file('META-INF/mods.toml');
 
           if (file) {
-            const content = await file.async('text');
-            let modName = '';
+            const extension = path.extname(file.name);
+            if (extension === '.json') {
+              const rawData = await file.async('string');
+              const jsonData = JSON.parse(rawData);
 
-            if (file.name.endsWith('.json') && content.includes('"name":')) {
-              modName = content.match(/"name":\s*"([^"]+)"/)?.[1];
+              const modInfo = [jsonData.id, jsonData.name, jsonData.version, jarFile];
+
+              modsList.push(modInfo);
+
+            } else if (extension === '.toml') {
+              const rawData = await file.async('string');
+              const tomlData = toml.parse(rawData);
+              const mod = tomlData.mods[0];
+
+              const modInfo = [mod.modId, mod.displayName, mod.version, jarFile];
+
+              modsList.push(modInfo);
             }
-
-            if (file.name.endsWith('.toml') && content.includes('displayName=')) {
-              modName = content.match(/displayName=\s*"([^"]+)"/)?.[1];
-            }
-
-            if (!modName) modName = jarFile;
-
-            modNamesList.push(modNamesList.length + ' - ' + modName);
-
           } else {
-            console.log(`No mod metadata of anykind found at ${jarFile}`);
+            console.log(`No mod metadata of any kind found at ${jarFile}`);
           }
         } catch (error) {
           console.error('Error reading JAR file:', error);
         }
       }
-      resolve(modNamesList);
+
+      //TODO Reverse Search Algorithm o Usar la info del jar (icon, dependencies)
+
+      resolve();
     });
   });
 }
+
 ipcMain.handle('load-mod-folder-list', async () => {
   try {
     return await loadModFolderList();

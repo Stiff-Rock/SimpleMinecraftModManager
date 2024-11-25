@@ -144,7 +144,6 @@ async function loadInfoIntoPage() {
             const downloadButton = modVersionItem.querySelector('.download-button');
             downloadButton.addEventListener("click", async () => {
                 startDownload(version);
-                // https://api.modrinth.com/v2/project/YL57xq9U/version MANAGE FOLDER OR AT LEAST STORE IT
             });
 
             modVersionList.appendChild(modVersionItem);

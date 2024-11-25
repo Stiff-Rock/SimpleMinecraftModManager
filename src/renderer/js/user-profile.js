@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     autoDownloadDependenciesSelect.addEventListener('change', (event) => {
-      window.api.setAutodownloadDependencies(event.target.value === 'true');
+      window.api.setAutoDownloadDependencies(event.target.value === 'true');
     });
 
     themeSelect.addEventListener('change', (event) => {
