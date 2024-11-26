@@ -87,15 +87,13 @@ async function setupGameSettingsSelects() {
   });
 }
 
+// TODO: Los filtros de búsqueda deben tener una opción de "any"
 async function fetchMods(page = 1) {
   try {
     if (page != 0) currentPage = page;
 
     if (!versionFacet) versionFacet = ",[%22versions:" + await window.api.getVersion() + "%22]";
     if (!loaderFacet) loaderFacet = ",[%22categories:" + await window.api.getLoader() + "%22]";
-
-    console.log(versionFacet)
-    console.log(loaderFacet)
 
     const offsetAmount = (currentPage - 1) * itemsPerPage;
     const url = "https://api.modrinth.com/v2"
@@ -121,7 +119,7 @@ async function loadModsPage() {
   const modList = document.getElementById('mod-list');
   modList.innerHTML = '';
 
-  // TODO Esto no está bien, cuando implemente react lo mejoraré
+  // TODO: Esto no está bien, cuando implemente react lo mejoraré
   const queryContainer = document.createElement('div');
   queryContainer.style.display = "flex";
   queryContainer.style.alignItems = "center";

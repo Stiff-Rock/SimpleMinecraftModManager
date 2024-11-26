@@ -1,15 +1,13 @@
 async function getModList() {
   let mods = await window.api.loadModFolderList();
 
-
   if (!mods.length > 0) {
     addModCard('No mods found in folder');
   } else {
-    mods.forEach(element => {
+    for (const element of mods) {
       addModCard(element);
-    });
+    }
   }
-
 }
 
 function addModCard(mod) {
@@ -21,15 +19,11 @@ function addModCard(mod) {
   const modContent = document.createElement('div');
   modContent.classList.add('mod-content');
   modContent.addEventListener('click', () => {
-    localStorage.setItem('selectedMod', mod.project_id);
-    window.location.href = 'mod-view.html';
+    // TODO: Dirigirte a la pagina del indice con una búsqueda del mod realizada
+    // localStorage.setItem('selectedMod', mod.project_id);
+    // window.location.href = 'mod-view.html';
   });
   modItem.appendChild(modContent);
-
-  const modImg = document.createElement('img');
-  modImg.src = mod.icon_url ?? '../img/default-mod-icon.png';
-  modImg.classList.add('mod-img');
-  modContent.appendChild(modImg);
 
   const modInfoContainer = document.createElement('div');
   modInfoContainer.classList.add('mod-info-container');
@@ -37,15 +31,32 @@ function addModCard(mod) {
 
   const modName = document.createElement('p');
   modName.classList.add('mod-title');
-  modName.textContent = mod.title;
+  modName.textContent = mod[0] + " - " + mod[1];
   modInfoContainer.appendChild(modName);
 
   const modDescription = document.createElement('p');
   modDescription.classList.add('mod-description');
-  modDescription.textContent = mod.description;
+  modDescription.textContent = mod[2];
   modInfoContainer.appendChild(modDescription);
 
+  const buttonDiv = document.createElement('div');
+  buttonDiv.classList.add('download-section')
+  modItem.appendChild(buttonDiv);
+
+  const downloadButton = document.createElement('button');
+  downloadButton.classList.add('download-btn');
+  downloadButton.textContent = 'Delete';
+
+  downloadButton.addEventListener('click', (e) => {
+    e.stopImmediatePropagation;
+    window.api.deleteFile(mod[3]);
+    modItem.remove();
+  });
+  buttonDiv.appendChild(downloadButton);
+
+
   modList.appendChild(modItem);
+  modList.appendChild(document.createElement('br'));
 }
 
 const waitForDOMReady = () => {

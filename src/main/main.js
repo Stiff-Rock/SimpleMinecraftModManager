@@ -85,12 +85,15 @@ function loadModFolderList() {
       if (err) return reject(err);
 
       const jarFiles = files.filter(file => file.endsWith('.jar'));
-      let modsList = [jarFiles.length];
+
+      let modsList = [];
+      let modInfo = [];
 
       for (const jarFile of jarFiles) {
         try {
 
           const zip = await JSZip.loadAsync(fs.readFileSync(path.join(dir, jarFile)));
+
           const file = zip.file('fabric.mod.json') || zip.file('META-INF/mods.toml');
 
           if (file) {
@@ -99,18 +102,19 @@ function loadModFolderList() {
               const rawData = await file.async('string');
               const jsonData = JSON.parse(rawData);
 
-              const modInfo = [jsonData.id, jsonData.name, jsonData.version, jarFile];
-
-              modsList.push(modInfo);
-
+              modInfo = [jsonData.name, jsonData.version, jsonData.description, jarFile];
             } else if (extension === '.toml') {
               const rawData = await file.async('string');
               const tomlData = toml.parse(rawData);
               const mod = tomlData.mods[0];
 
-              const modInfo = [mod.modId, mod.displayName, mod.version, jarFile];
+              modInfo = [mod.displayName, mod.version, mod.description, jarFile];
+            }
 
+            if (modInfo) {
               modsList.push(modInfo);
+            } else {
+              console.log(`No metadata info found in .jar at ${jarFile}`);
             }
           } else {
             console.log(`No mod metadata of any kind found at ${jarFile}`);
@@ -120,21 +124,32 @@ function loadModFolderList() {
         }
       }
 
-      //TODO Reverse Search Algorithm o Usar la info del jar (icon, dependencies)
-
-      resolve();
+      resolve(modsList);
     });
   });
 }
 
 ipcMain.handle('load-mod-folder-list', async () => {
   try {
-    return await loadModFolderList();
+    return loadModFolderList();
   } catch (err) {
     console.error('Error loading mod folder list:', err);
     return [];
   }
 });
+
+ipcMain.handle('delete-file', async (_, fileName) => {
+  const filePath = path.join(userDownloadDirectory, fileName);
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(`Error deleting file: ${err.message}`);
+      return;
+    }
+    console.log('File deleted successfully!');
+  });
+
+})
 
 ipcMain.handle('get-config', async () => {
   return config;

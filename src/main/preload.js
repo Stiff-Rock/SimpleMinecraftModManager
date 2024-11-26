@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld('api', {
 
   // Other existing methods
   loadModFolderList: () => ipcRenderer.invoke('load-mod-folder-list'),
+  deleteFile: (fileName) => ipcRenderer.invoke('delete-file', fileName),
   getConfig: () => ipcRenderer.invoke('get-config'),
   setDownloadPath: () => ipcRenderer.invoke('dialog:openDirectory'),
   downloadFile: (url, fileName) => ipcRenderer.invoke('download-file', url, fileName),
