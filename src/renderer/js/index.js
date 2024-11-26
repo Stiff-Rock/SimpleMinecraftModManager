@@ -87,6 +87,7 @@ async function setupGameSettingsSelects() {
   });
 }
 
+// FIX: Por algún motivo se llama a esta funcion dos veces al abrir la app
 // TODO: Los filtros de búsqueda deben tener una opción de "any"
 async function fetchMods(page = 1) {
   try {
@@ -94,6 +95,13 @@ async function fetchMods(page = 1) {
 
     if (!versionFacet) versionFacet = ",[%22versions:" + await window.api.getVersion() + "%22]";
     if (!loaderFacet) loaderFacet = ",[%22categories:" + await window.api.getLoader() + "%22]";
+
+    const storedQuery = localStorage.getItem('selectedMod');
+    if (storedQuery && storedQuery != 'undefined') {
+      console.log("ENTRO")
+      query = storedQuery
+      localStorage.clear()
+    }
 
     const offsetAmount = (currentPage - 1) * itemsPerPage;
     const url = "https://api.modrinth.com/v2"

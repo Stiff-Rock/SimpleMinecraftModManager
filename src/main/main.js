@@ -5,6 +5,7 @@ const https = require('https');
 const os = require('os');
 const JSZip = require('jszip');
 const toml = require('toml');
+const { rejects } = require('assert');
 
 let config = {};
 const configPath = path.join(__dirname, '..', 'config', 'config.json');
@@ -114,7 +115,7 @@ function loadModFolderList() {
             if (modInfo) {
               modsList.push(modInfo);
             } else {
-              console.log(`No metadata info found in .jar at ${jarFile}`);
+              console.log(`No .json or .toml found in .jar at ${jarFile}`);
             }
           } else {
             console.log(`No mod metadata of any kind found at ${jarFile}`);

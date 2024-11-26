@@ -1,9 +1,7 @@
 async function getModList() {
   let mods = await window.api.loadModFolderList();
 
-  if (!mods.length > 0) {
-    addModCard('No mods found in folder');
-  } else {
+  if (mods.length > 0) {
     for (const element of mods) {
       addModCard(element);
     }
@@ -19,9 +17,8 @@ function addModCard(mod) {
   const modContent = document.createElement('div');
   modContent.classList.add('mod-content');
   modContent.addEventListener('click', () => {
-    // TODO: Dirigirte a la pagina del indice con una búsqueda del mod realizada
-    // localStorage.setItem('selectedMod', mod.project_id);
-    // window.location.href = 'mod-view.html';
+    localStorage.setItem('selectedMod', mod[0]);
+    window.location.href = 'index.html';
   });
   modItem.appendChild(modContent);
 
