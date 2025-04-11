@@ -29,6 +29,7 @@
     "electron": "^33.0.1"
   },
   "dependencies": {
+    "jszip": "^3.10.1",
     "toml": "^3.0.0"
   }
 }
